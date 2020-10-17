@@ -92,18 +92,18 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
                 }
             }
 
-            if (currentBitcoinBlock == null) {
-                return false;
-            }
-            BitcoinTransaction currentTransaction = currentBitcoinBlock.getTransactions().get(currentTransactionCounterInBlock);
-            // the unique identifier that is linked in other transaction is usually its hash
-            byte[] newKey = BitcoinUtil.getTransactionHash(currentTransaction);
-            key.set(newKey, 0, newKey.length);
-            value.set(currentTransaction);
-            currentTransactionCounterInBlock++;
-            return true;
-        }
-        return false;
-    }
+		if (currentBitcoinBlock==null) {
+			return false;
+		}
+		BitcoinTransaction currentTransaction=currentBitcoinBlock.getTransactions().get(currentTransactionCounterInBlock);
+		// the unique identifier that is linked in other transaction is usually its hash
+		byte[] newKey = currentTransaction.getTransactionHash();
+		key.set(newKey, 0, newKey.length);
+		value.set(currentTransaction);
+		currentTransactionCounterInBlock++;
+		return true;
+	}
+	return false;
+}
 
 }
