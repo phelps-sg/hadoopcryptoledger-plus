@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BitcoinFormatReaderTest {
 
+    static final String GENESIS_MERKLE_ROOT = "4A5E1E4BAAB89F3A32518A88C31BC87F618F76673E2CC77AB2127B7AFDEDA33B";
+
     static final int DEFAULT_BUFFERSIZE = 64 * 1024;
     static final int DEFAULT_MAXSIZE_BITCOINBLOCK = 8 * 1024 * 1024;
     static final byte[][] DEFAULT_MAGIC = {{(byte) 0xF9, (byte) 0xBE, (byte) 0xB4, (byte) 0xD9}};
@@ -712,6 +714,20 @@ public class BitcoinFormatReaderTest {
     }
 
     @Test
+    public void calculateMerkleRoot() throws IOException, BitcoinBlockReadException {
+        BitcoinBlockReader bbr = null;
+        try {
+            BitcoinBlock genesisBlock = assertGenesisBlockAvailable();
+            byte[] root = genesisBlock.calculateMerkleRoot();
+            assertEquals(GENESIS_MERKLE_ROOT, BitcoinUtil.convertByteArrayToHexString(root));
+        } finally {
+            if (bbr != null) {
+                bbr.close();
+            }
+        }
+    }
+
+    @Test
     public void seekBlockStartHeap() throws IOException, BitcoinBlockReadException {
         BitcoinBlockReader bbr = null;
         try {
@@ -792,6 +808,16 @@ public class BitcoinFormatReaderTest {
 
     public BitcoinBlockReader genesisBlockReader(boolean direct) throws IOException {
         return assertBlockAvailable("genesis.blk", direct);
+    }
+
+    public BitcoinBlock assertGenesisBlockAvailable() throws IOException, BitcoinBlockReadException {
+        BitcoinBlockReader bbr = null;
+        try {
+            bbr = genesisBlockReader(true);
+            return bbr.readBlock();
+        } finally {
+           bbr.close();
+        }
     }
 
     public void assertTestFileAvailable(String fileName) {

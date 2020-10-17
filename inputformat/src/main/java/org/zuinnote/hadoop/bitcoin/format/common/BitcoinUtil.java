@@ -1,18 +1,18 @@
 /**
-* Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-**/
+ * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
@@ -64,47 +64,47 @@ public class BitcoinUtil {
     }
 
 
-/**
-*
-* Converts a long to a byte array
-*
-* @param longToConvert long that should be converted into a byte array
-*
-* @return byte array corresponding to long
-*
-**/
-public static byte[] convertLongToByteArray(long longToConvert) {
-	return ByteBuffer.allocate(8).putLong(longToConvert).array();
-}
+    /**
+     *
+     * Converts a long to a byte array
+     *
+     * @param longToConvert long that should be converted into a byte array
+     *
+     * @return byte array corresponding to long
+     *
+     **/
+    public static byte[] convertLongToByteArray(long longToConvert) {
+        return ByteBuffer.allocate(8).putLong(longToConvert).array();
+    }
 
 
-/**
-*
-* Converts a Big Integer to a byte array
-*
-* @param bigIntegerToConvert BigInteger that should be converted into a byte array
-* @param exactArraySize exact size of array
-* @return byte array corresponding to BigInteger
-*
-**/
-public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert,int exactArraySize) {
-	if ((bigIntegerToConvert==null) || (bigIntegerToConvert.signum()==-1))  {// negative
-		return null;
-	}
-	 byte[] tempResult = bigIntegerToConvert.toByteArray();
-	 byte [] result = new byte[exactArraySize];
-	 int removeSign=0;
-	 if ((tempResult.length>1) && (tempResult[0]==0)) { // remove sign
-		removeSign=1;
-	 } 
-	 byte[] reverseTempResult = BitcoinUtil.reverseByteArray(tempResult);
-	 for (int i=0;i<result.length;i++) {
-		 if (i<reverseTempResult.length-removeSign) {
-			 result[i]=reverseTempResult[i];
-		 }
-	 }
-	 return result;
-}
+    /**
+     *
+     * Converts a Big Integer to a byte array
+     *
+     * @param bigIntegerToConvert BigInteger that should be converted into a byte array
+     * @param exactArraySize exact size of array
+     * @return byte array corresponding to BigInteger
+     *
+     **/
+    public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert, int exactArraySize) {
+        if ((bigIntegerToConvert == null) || (bigIntegerToConvert.signum() == -1)) {// negative
+            return null;
+        }
+        byte[] tempResult = bigIntegerToConvert.toByteArray();
+        byte[] result = new byte[exactArraySize];
+        int removeSign = 0;
+        if ((tempResult.length > 1) && (tempResult[0] == 0)) { // remove sign
+            removeSign = 1;
+        }
+        byte[] reverseTempResult = BitcoinUtil.reverseByteArray(tempResult);
+        for (int i = 0; i < result.length; i++) {
+            if (i < reverseTempResult.length - removeSign) {
+                result[i] = reverseTempResult[i];
+            }
+        }
+        return result;
+    }
 
 
     /**
@@ -307,32 +307,63 @@ public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert
 
     }
 
-	/**
-	 * Calculates the double SHA256-Hash of a transaction in little endian format. This could be used for certain analysis scenario where one want to investigate the referenced transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
-	 * <p>
-	 * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
-	 *
-	 * @param transaction The BitcoinTransaction of which we want to calculate the hash
-	 * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-	 * @throws java.io.IOException in case of errors reading from the InputStream
+    /**
+     * Calculates the double SHA256-Hash of a transaction in little endian format. This could be used for certain analysis scenario where one want to investigate the referenced transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
+     * <p>
+     * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
+     *
+     * @param transaction The BitcoinTransaction of which we want to calculate the hash
+     * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     * @throws java.io.IOException in case of errors reading from the InputStream
      * @deprecated Use transaction.getTransactionHash()
-	 */
-	public static byte[] getTransactionHash(BitcoinTransaction transaction) throws IOException {
-		return transaction.getTransactionHash();
-	}
+     */
+    public static byte[] getTransactionHash(BitcoinTransaction transaction) throws IOException {
+        return transaction.getTransactionHash();
+    }
 
-	/**
-	 * Calculates the double SHA256-Hash of a transaction in little endian format. It serve as a unique identifier of a transaction, but cannot be used to link the outputs of other transactions as input
-	 * <p>
-	 * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/)
-	 *
-	 * @param transaction The BitcoinTransaction of which we want to calculate the hash
-	 * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-	 * @throws java.io.IOException in case of errors reading from the InputStream
-	 * @deprecated Use transaction.getTransactionHashSegWit()
-	 */
-	public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) throws IOException {
-		return transaction.getTransactionHashSegwit();
-	}
+    /**
+     * Calculates the double SHA256-Hash of a transaction in little endian format. It serve as a unique identifier of a transaction, but cannot be used to link the outputs of other transactions as input
+     * <p>
+     * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/)
+     *
+     * @param transaction The BitcoinTransaction of which we want to calculate the hash
+     * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     * @throws java.io.IOException in case of errors reading from the InputStream
+     * @deprecated Use transaction.getTransactionHashSegWit()
+     */
+    public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) throws IOException {
+        return transaction.getTransactionHashSegwit();
+    }
+
+    /**
+     * Calculates the hash of hash on the given chunks of bytes.
+     */
+    public static byte[] hashTwice(byte[] input1, byte[] input2) {
+        MessageDigest digest = newDigest();
+        digest.update(input1);
+        digest.update(input2);
+        return digest.digest(digest.digest());
+    }
+
+    public static byte[] hash(byte[] input) {
+        MessageDigest digest = newDigest();
+        return digest.digest(input);
+    }
+
+    /**
+     * Returns a new SHA-256 MessageDigest instance.
+     *
+     * This is a convenience method which wraps the checked
+     * exception that can never occur with a RuntimeException.
+     *
+     * @return a new SHA-256 MessageDigest instance
+     */
+    public static MessageDigest newDigest() {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
+    }
 
 }

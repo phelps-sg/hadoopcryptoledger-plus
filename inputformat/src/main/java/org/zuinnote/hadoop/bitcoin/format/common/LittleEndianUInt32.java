@@ -49,6 +49,10 @@ public class LittleEndianUInt32 extends Number {
         }
     }
 
+    public ByteBuffer getRawData() {
+        return rawData;
+    }
+
     public void setValue(long value) {
         rawData.putInt(0, (int) value);
     }
