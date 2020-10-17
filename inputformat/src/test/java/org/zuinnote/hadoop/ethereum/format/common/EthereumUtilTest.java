@@ -17,12 +17,11 @@
 package org.zuinnote.hadoop.ethereum.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPElement;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPList;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPObject;
+import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,12 +29,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPElement;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPList;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPObject;
-import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EthereumUtilTest {
 	static final int DEFAULT_BUFFERSIZE=64*1024;

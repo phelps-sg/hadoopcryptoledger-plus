@@ -15,13 +15,13 @@
  **/
 package org.zuinnote.hadoop.ethereum.format.mapreduce;
 
-import java.io.IOException;
-
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumBlock;
+
+import java.io.IOException;
 
 /**
  *

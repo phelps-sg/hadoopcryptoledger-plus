@@ -16,23 +16,20 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.io.BufferedInputStream;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import java.util.List;
 
 /**
 * This class reads Bitcoin blocks (in raw network format) from an input stream and returns Java objects of the class BitcoinBlock. It reuses code from the LineRecordReader due to its robustness and well-tested functionality.

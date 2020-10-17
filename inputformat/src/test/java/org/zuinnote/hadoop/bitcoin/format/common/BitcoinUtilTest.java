@@ -17,24 +17,18 @@
 package org.zuinnote.hadoop.bitcoin.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import java.nio.ByteBuffer;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BitcoinUtilTest {
 

@@ -16,20 +16,16 @@
 package org.zuinnote.hadoop.namecoin.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlockReader;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlockReader;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NamecoinAuxPOWTest {
 	static final int DEFAULT_BUFFERSIZE=64*1024;

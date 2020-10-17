@@ -16,8 +16,6 @@
 package org.zuinnote.hadoop.bitcoin.format.common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BitcoinAuxPOW implements Serializable {
 

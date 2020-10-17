@@ -15,8 +15,6 @@
  **/
 package org.zuinnote.hadoop.ethereum.format.mapred;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BytesWritable;
@@ -25,6 +23,8 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumBlock;
 import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
+
+import java.io.IOException;
 
 /**
  *

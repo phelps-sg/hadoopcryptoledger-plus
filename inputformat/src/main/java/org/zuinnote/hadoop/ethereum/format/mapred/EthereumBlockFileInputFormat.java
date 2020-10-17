@@ -15,13 +15,9 @@
  **/
 package org.zuinnote.hadoop.ethereum.format.mapred;
 
-import java.io.IOException;
+import org.apache.hadoop.mapred.*;
 
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
+import java.io.IOException;
 
 /**
  *

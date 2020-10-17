@@ -16,20 +16,14 @@
 
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
-import java.io.IOException;
-
-
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobConfigurable;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.*;
+
+import java.io.IOException;
 
 
 public abstract class AbstractBitcoinFileInputFormat<K, V> extends FileInputFormat<K, V> implements JobConfigurable {

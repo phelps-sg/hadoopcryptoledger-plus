@@ -17,31 +17,22 @@
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
 
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.compress.BZip2Codec;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.util.ReflectionUtils;
+import org.junit.jupiter.api.*;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinTransaction;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapred.*;
-import org.apache.hadoop.util.*;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.apache.hadoop.io.compress.BZip2Codec;
-import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.io.compress.CompressionCodec;
-
-import org.zuinnote.hadoop.bitcoin.format.common.*;
-
-import org.zuinnote.hadoop.bitcoin.format.mapred.BitcoinBlockFileInputFormat;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
 *
