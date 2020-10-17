@@ -17,11 +17,10 @@
 package org.zuinnote.hadoop.ethereum.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.Test;
+import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author jornfranke

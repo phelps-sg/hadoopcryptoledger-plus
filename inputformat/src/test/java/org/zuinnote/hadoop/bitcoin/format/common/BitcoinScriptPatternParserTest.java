@@ -17,13 +17,10 @@
 package org.zuinnote.hadoop.bitcoin.format.common;
 
 
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinScriptPatternParser;
 
 
 public class BitcoinScriptPatternParserTest {
