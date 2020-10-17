@@ -15,13 +15,12 @@
 **/
 package org.zuinnote.hadoop.namecoin.format.common;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 public class NamecoinUtil {
 	private static final Log LOG = LogFactory.getLog(NamecoinUtil.class.getName());
 	

@@ -17,11 +17,8 @@
 package org.zuinnote.hadoop.bitcoin.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +27,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-import org.junit.jupiter.api.Test;
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlockReader;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BitcoinFormatReaderTest {

@@ -16,12 +16,10 @@
 package org.zuinnote.hadoop.namecoin.format.common;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NamecoinUtilTest {
 	

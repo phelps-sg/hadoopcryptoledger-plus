@@ -15,15 +15,14 @@
 **/
 package org.zuinnote.hadoop.ethereum.format.mapreduce;
 
-import java.io.IOException;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumBlock;
 import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
-import org.zuinnote.hadoop.ethereum.format.mapreduce.AbstractEthereumRecordReader;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
 /**
  *
  */

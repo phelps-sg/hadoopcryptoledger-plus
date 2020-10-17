@@ -17,20 +17,17 @@
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.BytesWritable; 
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
-import org.zuinnote.hadoop.bitcoin.format.common.*;
+import java.io.IOException;
 
 /**
 * Reads records as blocks of the bitcoin blockchain. Note that it can be tricky to find the start of a block in a split. The BitcoinBlockReader provides a method (seekBlockStart) for this.

@@ -16,16 +16,14 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.apache.hadoop.io.Writable;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import org.apache.commons.io.output.ThresholdingOutputStream;
-import org.apache.hadoop.io.Writable;
-
 import java.io.Serializable;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class BitcoinTransaction implements Serializable, Writable {

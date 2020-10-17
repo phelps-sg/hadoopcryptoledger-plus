@@ -15,13 +15,13 @@
 **/
 package org.zuinnote.hadoop.ethereum.format.common;
 
+import org.apache.hadoop.io.Writable;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-
-import org.apache.hadoop.io.Writable;
 
 
 public class EthereumBlock implements Writable,Serializable {

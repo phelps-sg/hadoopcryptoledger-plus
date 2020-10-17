@@ -15,6 +15,13 @@
 **/
 package org.zuinnote.hadoop.ethereum.format.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPElement;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPList;
+import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPObject;
+import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPElement;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPList;
-import org.zuinnote.hadoop.ethereum.format.common.rlp.RLPObject;
-import org.zuinnote.hadoop.ethereum.format.exception.EthereumBlockReadException;
 
 /**
  * This class parses Ethereum RLP-encoded blocks

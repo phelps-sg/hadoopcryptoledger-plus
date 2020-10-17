@@ -16,22 +16,19 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
-
-import javax.xml.bind.DatatypeConverter; // Hex Converter for configuration options
-
-import java.security.MessageDigest; // needed for SHA2-256 calculation
-import java.security.NoSuchAlgorithmException;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 public class BitcoinUtil {

@@ -17,22 +17,17 @@
 package org.zuinnote.hadoop.bitcoin.format.mapreduce;
 
 
-
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.BytesWritable;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinTransaction;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
 import java.io.IOException;
-
-
-import org.apache.hadoop.io.BytesWritable; 
-
-import org.apache.hadoop.conf.Configuration;
-
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import org.zuinnote.hadoop.bitcoin.format.common.*;
 
 
 public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BitcoinTransaction> {
