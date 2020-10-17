@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BitcoinFormatReaderTest {
 
     static final String GENESIS_MERKLE_ROOT = "4A5E1E4BAAB89F3A32518A88C31BC87F618F76673E2CC77AB2127B7AFDEDA33B";
+    static final String GENESIS_HASH = "000000000019D6689C085AE165831E934FF763AE46A2A6C172B3F1B60A8CE26F";
+    static final String GENESIS_DATE = "2009-01-03 18:15:05";
 
     static final int DEFAULT_BUFFERSIZE = 64 * 1024;
     static final int DEFAULT_MAXSIZE_BITCOINBLOCK = 8 * 1024 * 1024;
@@ -214,7 +216,7 @@ public class BitcoinFormatReaderTest {
             bbr = genesisBlockReader(true);
             BitcoinBlock genesisBlock = bbr.readBlock();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd h:m:s");
-            Date genesisDate = format.parse ( "2009-01-03 18:15:05" );
+            Date genesisDate = format.parse(GENESIS_DATE);
             Date blockDate = genesisBlock.getDate();
             assertDateFieldsEqual(genesisDate, blockDate);
         } finally {
@@ -720,6 +722,20 @@ public class BitcoinFormatReaderTest {
             BitcoinBlock genesisBlock = assertGenesisBlockAvailable();
             byte[] root = genesisBlock.calculateMerkleRoot();
             assertEquals(GENESIS_MERKLE_ROOT, BitcoinUtil.convertByteArrayToHexString(root));
+        } finally {
+            if (bbr != null) {
+                bbr.close();
+            }
+        }
+    }
+
+    @Test
+    public void testGenesisHash() throws IOException, BitcoinBlockReadException {
+        BitcoinBlockReader bbr = null;
+        try {
+            BitcoinBlock genesisBlock = assertGenesisBlockAvailable();
+            byte[] hash = genesisBlock.getHash();
+            assertEquals(GENESIS_HASH, BitcoinUtil.convertByteArrayToHexString(hash));
         } finally {
             if (bbr != null) {
                 bbr.close();

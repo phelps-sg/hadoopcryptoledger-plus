@@ -345,6 +345,12 @@ public class BitcoinUtil {
         return digest.digest(digest.digest());
     }
 
+    public static byte[] hashTwice(byte[] input) {
+        MessageDigest digest = newDigest();
+        digest.update(input);
+        return digest.digest(digest.digest());
+    }
+
     public static byte[] hash(byte[] input) {
         MessageDigest digest = newDigest();
         return digest.digest(input);

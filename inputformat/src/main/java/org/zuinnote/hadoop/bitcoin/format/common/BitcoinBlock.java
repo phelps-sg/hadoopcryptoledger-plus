@@ -16,23 +16,27 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.file.tfile.ByteArray;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 /**
-* This class is an object storing relevant fields of a Bitcoin Block. 
-*/
-
+ * <p>
+ * This class is an object storing relevant fields of a Bitcoin Block.
+ * </p>
+ *
+ * <p>
+ * It contains modified code from
+ *  <https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java>
+ *  by Andreas Schildbach.
+ *  </p>
+ **/
 public class BitcoinBlock implements Serializable, Writable {
 
     private LittleEndianUInt32 blockSize;
@@ -175,10 +179,20 @@ public class BitcoinBlock implements Serializable, Writable {
         throw new UnsupportedOperationException("readFields unsupported");
     }
 
+    /**
+     * Get the time field as a Unix epoch time.
+     *
+     * @return  A positive 64-bit integer representing the number of seconds elapsed since the Epoch.
+     */
     public long getEpochTime() {
         return getTime().longValue();
     }
 
+    /**
+     * Get the time field as a Java Date.
+     *
+     * @return  The time-stamp for the block as a java.util.Date object.
+     */
     public Date getDate() {
         return new Date(getEpochTime() * 1000L);
     }
@@ -253,18 +267,26 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public byte[] calculateMerkleRoot() {
         List<byte[]> tree = buildMerkleTree();
-//        return BitcoinUtil.hash(tree.get(tree.size() - 1));
         return tree.get(tree.size() - 1);
     }
 
+    public byte[] getHash() {
+        return BitcoinUtil.reverseByteArray(BitcoinUtil.hashTwice(getHeader()));
+    }
+
     public byte[] getHeader() {
-        ByteBuffer header = ByteBuffer.allocate(4*5);
-        header.put(version.getRawData());
-        header.put(hashPrevBlock);
-        header.put(BitcoinUtil.reverseByteArray(BitcoinUtil.hash(calculateMerkleRoot())));
-        header.put(time.getRawData());
-        header.put(bits);
-        header.put(nonce.getRawData());
-        return header.array();
+        try {
+            ByteArrayOutputStream header = new ByteArrayOutputStream();
+            header.write(version.getRawData().array());
+            header.write(hashPrevBlock);
+            header.close();
+            header.write(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
+            header.write(time.getRawData().array());
+            header.write(bits);
+            header.write(nonce.getRawData().array());
+            return header.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Should never happen
+        }
     }
 }
