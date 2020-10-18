@@ -12,6 +12,7 @@ cleaner API adhering to object-oriented design principles; in particular:
 - cleaner exception handling
 - simpler unit-tests
 - refactoring of duplicated code
+- adherence to Java style guide
 
 ## Building
 
