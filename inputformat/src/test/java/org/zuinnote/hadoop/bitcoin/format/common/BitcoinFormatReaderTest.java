@@ -534,7 +534,7 @@ public class BitcoinFormatReaderTest {
         assertEquals(4, theBitcoinBlock.getTransactions().get(0).getListOfInputs().get(0).getTxInScript().length, "Random Version 4 Block must contain exactly 936 transactions of which the first has one input and script length 4");
         assertEquals(2, theBitcoinBlock.getTransactions().get(0).getListOfOutputs().size(), "Random Version 4 Block must contain exactly 936 transactions of which the first has two outputs");
         assertEquals(25, theBitcoinBlock.getTransactions().get(0).getListOfOutputs().get(0).getTxOutScript().length, "Random Version 4 Block must contain exactly 936 transactions of which the first has two output and the first output script length 25");
-}
+    }
 
     @Test
     public void parseTestNet3Version4BlockAsBitcoinBlockDirect() throws IOException {
