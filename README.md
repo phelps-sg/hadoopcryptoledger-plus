@@ -1,7 +1,9 @@
 # hadoopcryptoledger-plus
 
-Fork of ZuInnoTe/hadoopcryptoledger with additional functionality 
-to compute block hashes and addresses as they appear in conventional block explorers.  
+Fork of ZuInnoTe/hadoopcryptoledger enhanced with:
+
+- additional functionality to compute block hashes and addresses as they appear in conventional block explorers.  
+- representation of unsigned 32-bit values, such as block nonce and time, with full range.
 
 In addition to providing the above features, this fork of the library aims to provide a simpler, 
 cleaner API adhering to object-oriented design principles; in particular:
