@@ -43,7 +43,7 @@ public class BitcoinBlock implements Serializable, Writable {
     private byte[] magicNo;
     private LittleEndianUInt32 version;
     private LittleEndianUInt32 time;
-    private byte[] bits;
+    private LittleEndianUInt32 bits;
     private LittleEndianUInt32 nonce;
     private byte[] hashPrevBlock;
     private byte[] hashMerkleRoot;
@@ -53,7 +53,6 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public BitcoinBlock() {
         this.magicNo = new byte[0];
-        this.bits = new byte[0];
         this.transactionCounter = 0;
         this.hashPrevBlock = new byte[0];
         this.hashMerkleRoot = new byte[0];
@@ -95,11 +94,11 @@ public class BitcoinBlock implements Serializable, Writable {
         this.time = time;
     }
 
-    public byte[] getBits() {
+    public LittleEndianUInt32 getBits() {
         return this.bits;
     }
 
-    public void setBits(byte[] bits) {
+    public void setBits(LittleEndianUInt32 bits) {
         this.bits = bits;
     }
 
@@ -273,13 +272,12 @@ public class BitcoinBlock implements Serializable, Writable {
     public byte[] getHeader() {
         try {
             ByteArrayOutputStream header = new ByteArrayOutputStream();
-            header.write(version.getRawData().array());
+            header.write(version.getBytes());
             header.write(hashPrevBlock);
-            header.close();
             header.write(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
-            header.write(time.getRawData().array());
-            header.write(bits);
-            header.write(nonce.getRawData().array());
+            header.write(time.getBytes());
+            header.write(bits.getBytes());
+            header.write(nonce.getBytes());
             return header.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);  // Should never happen

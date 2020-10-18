@@ -122,7 +122,6 @@ public class BitcoinBlockReader {
         // start parsing
         // initialize byte arrays
         byte[] currentMagicNo = new byte[4];
-        byte[] currentBits = new byte[4];
         byte[] currentHashMerkleRoot = new byte[32];
         byte[] currentHashPrevBlock = new byte[32];
         // magic no
@@ -138,7 +137,7 @@ public class BitcoinBlockReader {
         // time
         LittleEndianUInt32 currentTime = new LittleEndianUInt32(rawByteBuffer);
         // bits/difficulty
-        rawByteBuffer.get(currentBits, 0, 4);
+        LittleEndianUInt32 currentBits = new LittleEndianUInt32(rawByteBuffer);
         // nonce
         LittleEndianUInt32 currentNonce = new LittleEndianUInt32(rawByteBuffer);
 

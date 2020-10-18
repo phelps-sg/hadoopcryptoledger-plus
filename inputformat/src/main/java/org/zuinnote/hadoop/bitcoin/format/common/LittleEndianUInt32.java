@@ -53,6 +53,10 @@ public class LittleEndianUInt32 extends Number {
         return rawData;
     }
 
+    public byte[] getBytes() {
+        return rawData.array();
+    }
+
     public void setValue(long value) {
         rawData.putInt(0, (int) value);
     }
