@@ -21,6 +21,7 @@ import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -681,21 +682,18 @@ public class BitcoinFormatReaderTest {
         return assertBlockAvailable(fileName, direct, DEFAULT_MAGIC);
     }
 
-    public BitcoinBlockReader assertBlockReaderAvailable(String fileName, boolean direct) throws IOException {
+    public BitcoinBlockReader assertBlockReaderAvailable(String fileName, boolean direct) {
         return assertBlockReaderAvailable(fileName, direct, DEFAULT_MAGIC);
     }
 
-    public BitcoinBlockReader assertBlockReaderAvailable(String fileName, boolean direct, byte[][] magic) throws IOException {
-        assertTestFileAvailable(fileName);
-        BitcoinBlockReader bbr = null;
+    public BitcoinBlockReader assertBlockReaderAvailable(String fileName, boolean direct, byte[][] magic) {
         try {
+            assertTestFileAvailable(fileName);
             File file = new File(getFullFilename(fileName));
             FileInputStream fin = new FileInputStream(file);
-            bbr = new BitcoinBlockReader(fin, DEFAULT_MAXSIZE_BITCOINBLOCK, DEFAULT_BUFFERSIZE, magic, direct);
-            return bbr;
-        } catch (IOException e) {
-            bbr.close();
-            throw new RuntimeException(e);
+            return new BitcoinBlockReader(fin, DEFAULT_MAXSIZE_BITCOINBLOCK, DEFAULT_BUFFERSIZE, magic, direct);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);  // Should never happen
         }
     }
 
