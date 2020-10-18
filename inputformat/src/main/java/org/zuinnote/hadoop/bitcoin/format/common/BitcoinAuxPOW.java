@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 package org.zuinnote.hadoop.bitcoin.format.common;
 
 import java.io.Serializable;
@@ -26,9 +26,8 @@ public class BitcoinAuxPOW implements Serializable {
     private BitcoinAuxPOWBranch auxBlockChainBranch;
     private BitcoinAuxPOWBlockHeader parentBlockHeader;
 
-    /*
-     * Creates an empy AuxPOW object in case the feature is not used (e.g. in the main Bitcoin blockchain)
-     *
+    /**
+     * Creates an empty AuxPOW object in case the feature is not used (e.g. in the main Bitcoin blockchain)
      */
     public BitcoinAuxPOW() {
         this.version = 0;
