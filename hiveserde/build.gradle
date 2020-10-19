@@ -7,23 +7,17 @@ apply plugin: 'jacoco'
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
-group = "com.github.zuinnote"
-archivesBaseName = "hadoopcryptoledger-hiveserde"
-version = "1.2.1"
-
-
-
-
-
+group = "com.mesonomics"
+archivesBaseName = "hadoopcryptoledger-plus-hiveserde"
+version = "0.1"
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'ZuInnoTe - Hadoop CryptoLedger Analytics Library - Serde', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'Mesonomics - Hadoop CryptoLedger Analytics Library - Serde',
+                    'Implementation-Version': archiveVersion
     }
-
-    baseName = 'hadoopcryptoledger-hiveserde'
+    baseName = archivesBaseName
 }
-
 
 repositories {
     mavenCentral()
@@ -35,15 +29,12 @@ repositories {
 
 }
 
-
 jacocoTestReport {
     reports {
         xml.enabled true
         csv.enabled true
     }
 }
-
-
 
 test {
     testLogging.showStandardStreams = true
@@ -95,14 +86,12 @@ dependencies {
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
 }
 
-
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'com.github.zuinnote'
-            artifactId 'hadoopcryptoledger-hiveserde'
-            version '1.2.1'
-
+//            groupId 'com.github.zuinnote'
+//            artifactId 'hadoopcryptoledger-hiveserde'
+//            version '1.2.1'
             from components.java
         }
     }

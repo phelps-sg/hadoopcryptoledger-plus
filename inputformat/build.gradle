@@ -5,23 +5,20 @@ apply plugin: 'jacoco'
 apply plugin: 'org.owasp.dependencycheck'
 apply plugin: 'info.solidsoft.pitest'
 
-
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
-group = "com.github.phelps-sg"
+group = "com.mesonomics"
 archivesBaseName = "hadoopcryptoledger-plus-fileformat"
 version = "0.1"
 
-
 jar {
     manifest {
-        attributes 'Implementation-Title': 'hadoopcryptoledger-plus - Hadoop CryptoLedger Analytics Library - Inputformat', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'hadoopcryptoledger-plus - Hadoop CryptoLedger Analytics Library - Inputformat',
+                        'Implementation-Version': archiveVersion
     }
-    baseName = 'hadoopcryptoledger-plus-fileformat'
+    baseName = archivesBaseName
 }
-
-
 
 repositories {
     mavenCentral()
@@ -33,7 +30,6 @@ jacocoTestReport {
         csv.enabled true
     }
 }
-
 
 configurations {
 	umlDoclet
@@ -97,9 +93,9 @@ artifacts {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'com.github.phelps-sg'
-            artifactId 'hadoopcryptoledger-plus-fileformat'
-            version '0.1'
+//            groupId 'com.github.phelps-sg'
+//            artifactId 'hadoopcryptoledger-plus-fileformat'
+//            version '0.1'
             from components.java
         }
     }
@@ -118,4 +114,5 @@ dependencies {
    // test
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+    compile 'org.bitcoinj:bitcoinj-core:0.15.7'
 }

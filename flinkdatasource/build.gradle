@@ -7,28 +7,22 @@ apply plugin: 'jacoco'
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
-group = "com.github.zuinnote"
-archivesBaseName = "hadoopcryptoledger-flinkdatasource"
-version = "1.2.1"
-
+group = "com.mesonomics"
+archivesBaseName = "hadoopcryptoledger-plus-flinkdatasource"
+version = "0.1"
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'ZuInnoTe - Hadoop CryptoLedger Analytics Library - Flink Data Source', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'ZuInnoTe - Hadoop CryptoLedger Analytics Library - Flink Data Source',
+                   'Implementation-Version': archiveVersion
     }
-
-    baseName = 'hadoopcryptoledger-flinkdatasource'
-
+    baseName = archivesBaseName
 }
-
 
 repositories {
     mavenCentral()
     mavenLocal()
-
-
 }
-
 
 jacocoTestReport {
     reports {
@@ -36,9 +30,6 @@ jacocoTestReport {
         csv.enabled true
     }
 }
-
-
-
 
 configurations {
 	provided
@@ -93,9 +84,6 @@ publishing {
     }
 }
 
-
-
-
 test {
     testLogging.showStandardStreams = true
      useJUnitPlatform()
@@ -107,7 +95,6 @@ task hadoopCryptoLedgerJavaDocs(type: Jar) {
   classifier = 'javadoc'
   from javadoc
 }
-
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
