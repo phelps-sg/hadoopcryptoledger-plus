@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,34 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import javax.xml.bind.DatatypeConverter;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 
-import javax.xml.bind.DatatypeConverter; // Hex Converter for configuration options
-
-import java.security.MessageDigest; // needed for SHA2-256 calculation
-import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.bitcoinj.script.Script;
-import org.bitcoinj.script.ScriptPattern;
-
 
 public class BitcoinUtil {
-
-    private static final Log LOG = LogFactory.getLog(BitcoinUtil.class.getName());
 
     private BitcoinUtil() {
     }
@@ -206,7 +193,7 @@ public class BitcoinUtil {
     /**
      * Determines size of a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer)
      *
-     * @param firstByteVarInt first byte of the variable integeer
+     * @param firstByteVarInt first byte of the variable integer
      * @return byte with the size of the variable int (either 2, 3, 5 or 9) - does include the marker!
      */
 
@@ -318,11 +305,9 @@ public class BitcoinUtil {
      *
      * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
      *
-     * @throws java.io.IOException in case of errors reading from the InputStream
-     *
      * @deprecated Use {@link BitcoinTransaction#getTransactionHash()}
      */
-    public static byte[] getTransactionHash(BitcoinTransaction transaction) throws IOException {
+    public static byte[] getTransactionHash(BitcoinTransaction transaction) {
         return transaction.getTransactionHash();
     }
 
@@ -336,11 +321,9 @@ public class BitcoinUtil {
      * @return byte array containing the hash of the transaction.
      *          Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
      *
-     * @throws java.io.IOException in case of errors reading from the InputStream
-     *
      * @deprecated Use {@link BitcoinTransaction#getTransactionHashSegwit()}
      */
-    public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) throws IOException {
+    public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) {
         return transaction.getTransactionHashSegwit();
     }
 
