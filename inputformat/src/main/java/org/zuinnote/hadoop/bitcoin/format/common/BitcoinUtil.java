@@ -33,6 +33,8 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.script.ScriptPattern;
 
 
 public class BitcoinUtil {
@@ -313,9 +315,12 @@ public class BitcoinUtil {
      * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
+     *
      * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     *
      * @throws java.io.IOException in case of errors reading from the InputStream
-     * @deprecated Use transaction.getTransactionHash()
+     *
+     * @deprecated Use {@link BitcoinTransaction#getTransactionHash()}
      */
     public static byte[] getTransactionHash(BitcoinTransaction transaction) throws IOException {
         return transaction.getTransactionHash();
@@ -327,9 +332,13 @@ public class BitcoinUtil {
      * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
-     * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     *
+     * @return byte array containing the hash of the transaction.
+     *          Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     *
      * @throws java.io.IOException in case of errors reading from the InputStream
-     * @deprecated Use transaction.getTransactionHashSegWit()
+     *
+     * @deprecated Use {@link BitcoinTransaction#getTransactionHashSegwit()}
      */
     public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) throws IOException {
         return transaction.getTransactionHashSegwit();
