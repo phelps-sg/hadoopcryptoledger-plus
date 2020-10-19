@@ -201,7 +201,6 @@ public class BitcoinUtil {
         return 1; //<0xFD
     }
 
-
     /**
      * Reads a size from a reversed byte order, such as block size in the block header
      *
