@@ -132,7 +132,6 @@ public class BitcoinUtil {
      * @param varInt byte array containing variable length integer
      * @return BigInteger corresponding to variable length integer
      */
-
     public static BigInteger getVarIntBI(byte[] varInt) {
         BigInteger result = BigInteger.ZERO;
         if (varInt.length == 0) {
@@ -147,7 +146,7 @@ public class BitcoinUtil {
             intSize = 3;
         } else if (unsignedByte == 0xFE) {
             intSize = 5;
-        } else if (unsignedByte == 0XFF) {
+        } else {
             intSize = 9;
         }
         byte[] rawDataInt = reverseByteArray(Arrays.copyOfRange(varInt, 1, intSize));
@@ -175,7 +174,7 @@ public class BitcoinUtil {
             intSize = 3;
         } else if (unsignedByte == 0xFE) {
             intSize = 5;
-        } else if (unsignedByte == 0XFF) {
+        } else {
             intSize = 9;
         }
         byte[] rawDataInt = reverseByteArray(Arrays.copyOfRange(varInt, 1, intSize));
@@ -184,7 +183,7 @@ public class BitcoinUtil {
             result = byteBuffer.getShort();
         } else if (intSize == 5) {
             result = byteBuffer.getInt();
-        } else if (intSize == 9) {
+        } else {
             result = byteBuffer.getLong(); // Need to handle sign - available only in JDK8
         }
         return result;
