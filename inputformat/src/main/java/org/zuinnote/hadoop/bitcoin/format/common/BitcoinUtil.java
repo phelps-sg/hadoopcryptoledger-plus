@@ -52,9 +52,7 @@ public class BitcoinUtil {
         return ByteBuffer.allocate(4).putInt(intToConvert).array();
     }
 
-
     /**
-     *
      * Converts a long to a byte array
      *
      * @param longToConvert long that should be converted into a byte array
@@ -66,15 +64,12 @@ public class BitcoinUtil {
         return ByteBuffer.allocate(8).putLong(longToConvert).array();
     }
 
-
     /**
-     *
      * Converts a Big Integer to a byte array
      *
      * @param bigIntegerToConvert BigInteger that should be converted into a byte array
      * @param exactArraySize exact size of array
      * @return byte array corresponding to BigInteger
-     *
      **/
     public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert, int exactArraySize) {
         if ((bigIntegerToConvert == null) || (bigIntegerToConvert.signum() == -1)) {// negative
@@ -95,7 +90,6 @@ public class BitcoinUtil {
         return result;
     }
 
-
     /**
      * Converts a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) from a ByteBuffer to byte array
      *
@@ -112,7 +106,6 @@ public class BitcoinUtil {
         byteBuffer.get(varInt, 1, varIntSize - 1);
         return varInt;
     }
-
 
     /**
      * Converts a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) from a ByteBuffer to long
@@ -159,7 +152,6 @@ public class BitcoinUtil {
      * @param varInt byte array containing variable length integer
      * @return long corresponding to variable length integer
      */
-
     public static long getVarInt(byte[] varInt) {
         long result = 0;
         if (varInt.length == 0) {
@@ -239,7 +231,6 @@ public class BitcoinUtil {
         }
         return result;
     }
-
 
     /**
      * Converts a Hex String to Byte Array. Only used for configuration not for parsing.
