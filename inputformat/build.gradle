@@ -10,7 +10,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.mesonomics"
 archivesBaseName = "hadoopcryptoledger-plus-fileformat"
-version = "0.1"
+version = "0.2-SNAPSHOT"
 
 jar {
     manifest {
@@ -93,9 +93,7 @@ artifacts {
 publishing {
     publications {
         maven(MavenPublication) {
-//            groupId 'com.github.phelps-sg'
-//            artifactId 'hadoopcryptoledger-plus-fileformat'
-//            version '0.1'
+            artifactId archivesBaseName
             from components.java
         }
     }
