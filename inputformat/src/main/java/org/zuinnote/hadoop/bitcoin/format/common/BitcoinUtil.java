@@ -195,7 +195,6 @@ public class BitcoinUtil {
      * @param firstByteVarInt first byte of the variable integer
      * @return byte with the size of the variable int (either 2, 3, 5 or 9) - does include the marker!
      */
-
     public static byte getVarIntSize(byte firstByteVarInt) {
         int unsignedByte = firstByteVarInt & 0xFF;
         if (unsignedByte == 0xFD) {
@@ -217,7 +216,6 @@ public class BitcoinUtil {
      * @param byteSize byte array with a length of exactly 4
      * @return size, returns 0 in case of invalid block size
      */
-
     public static long getSize(byte[] byteSize) {
         if (byteSize.length != 4) {
             return 0;
