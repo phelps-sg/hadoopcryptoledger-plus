@@ -242,7 +242,8 @@ public class BitcoinUtil {
 
 
     /**
-     * Converts a Hex String to Byte Array. Only used for configuration not for parsing. Hex String is in format of xsd:hexBinary
+     * Converts a Hex String to Byte Array. Only used for configuration not for parsing.
+     * Hex String is in format of xsd:hexBinary
      *
      * @param hexString String in Hex format.
      * @return byte array corresponding to String in Hex format
@@ -253,7 +254,8 @@ public class BitcoinUtil {
 
 
     /**
-     * Converts a Byte Array to Hex String. Only used for configuration not for parsing. Hex String is in format of xsd:hexBinary
+     * Converts a Byte Array to Hex String. Only used for configuration not for parsing.
+     * Hex String is in format of xsd:hexBinary
      *
      * @param byteArray byte array to convert
      * @return String in Hex format corresponding to byteArray
@@ -294,7 +296,9 @@ public class BitcoinUtil {
     }
 
     /**
-     * Calculates the double SHA256-Hash of a transaction in little endian format. This could be used for certain analysis scenario where one want to investigate the referenced transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
+     * Calculates the double SHA256-Hash of a transaction in little endian format.
+     * This could be used for certain analysis scenario where one want to investigate the referenced
+     * transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
      * <p>
      * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
