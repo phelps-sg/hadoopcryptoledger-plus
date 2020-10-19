@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,6 @@ import java.math.BigInteger;
 
 public class BitcoinTransactionOutput implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 2854570630540937753L;
 
     private BigInteger value;
