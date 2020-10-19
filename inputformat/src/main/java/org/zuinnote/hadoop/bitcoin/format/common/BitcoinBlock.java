@@ -119,8 +119,10 @@ public class BitcoinBlock implements Serializable, Writable {
         this.transactionCounter = transactionCounter;
     }
 
-    public byte[] getHashPrevBlock() {
-        return this.hashPrevBlock;
+    public byte[] getHashPrevBlock() { return this.hashPrevBlock; }
+
+    public String getHashPrevBlockString() {
+        return BitcoinUtil.convertByteArrayToHexString(getHashPrevBlock());
     }
 
     public void setHashPrevBlock(byte[] hashPrevBlock) {
@@ -165,8 +167,6 @@ public class BitcoinBlock implements Serializable, Writable {
         this.transactions = newBitcoinBlock.getTransactions();
         this.auxPOW = newBitcoinBlock.getAuxPOW();
     }
-
-    /** Writable **/
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
@@ -267,6 +267,10 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public byte[] getHash() {
         return BitcoinUtil.reverseByteArray(BitcoinUtil.hashTwice(getHeader()));
+    }
+
+    public String getHashString() {
+        return BitcoinUtil.convertByteArrayToHexString(getHash());
     }
 
     public byte[] getHeader() {
