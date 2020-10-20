@@ -5,7 +5,7 @@ such as Hadoop and Apache Spark.  The core classes provide implementations of Ha
 
 The library is a fork of ZuInnoTe/hadoopcryptoledger enhanced with:
 
-- additional functionality to compute block hashes and addresses as they appear in conventional block explorers.  
+- additional functionality to compute BTC block hashes and addresses as they appear in conventional block explorers.  
 - representation of unsigned 32-bit values, such as block nonce and time, with full range.
 
 In addition to providing the above features, this fork of the library aims to provide a simpler, 
