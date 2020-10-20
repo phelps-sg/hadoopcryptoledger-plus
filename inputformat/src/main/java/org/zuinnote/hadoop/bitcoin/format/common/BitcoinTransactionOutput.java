@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,16 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.params.MainNetParams;
+import org.bitcoinj.script.Script;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 
 public class BitcoinTransactionOutput implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 2854570630540937753L;
 
     private BigInteger value;
@@ -46,6 +48,19 @@ public class BitcoinTransactionOutput implements Serializable {
 
     public byte[] getTxOutScript() {
         return this.txOutScript;
+    }
+
+    public Address getToAddress(NetworkParameters params) {
+        Script script = new Script(txOutScript);
+        return script.getToAddress(params);
+    }
+
+    public Address getToAddress() {
+        return getToAddress(MainNetParams.get());
+    }
+
+    public String getToAddressString() {
+        return getToAddress().toString();
     }
 
 }

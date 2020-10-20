@@ -606,8 +606,7 @@ public class BitcoinFormatReaderTest {
     @Test
     public void testGenesisHash() throws IOException {
         BitcoinBlock genesisBlock = assertGenesisBlockAvailable();
-        byte[] hash = genesisBlock.getHash();
-        assertEquals(GENESIS_HASH, BitcoinUtil.convertByteArrayToHexString(hash));
+        assertEquals(GENESIS_HASH, genesisBlock.getHashString());
     }
 
     @Test

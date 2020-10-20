@@ -9,7 +9,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.mesonomics"
 archivesBaseName = "hadoopcryptoledger-plus-hiveserde"
-version = "0.1"
+version = "0.2-SNAPSHOT"
 
 jar {
     manifest {

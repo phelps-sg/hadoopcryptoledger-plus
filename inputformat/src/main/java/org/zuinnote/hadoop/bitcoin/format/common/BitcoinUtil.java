@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,32 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import javax.xml.bind.DatatypeConverter;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 
-import javax.xml.bind.DatatypeConverter; // Hex Converter for configuration options
-
-import java.security.MessageDigest; // needed for SHA2-256 calculation
-import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
 
 public class BitcoinUtil {
-
-    private static final Log LOG = LogFactory.getLog(BitcoinUtil.class.getName());
 
     private BitcoinUtil() {
     }
@@ -63,9 +52,7 @@ public class BitcoinUtil {
         return ByteBuffer.allocate(4).putInt(intToConvert).array();
     }
 
-
     /**
-     *
      * Converts a long to a byte array
      *
      * @param longToConvert long that should be converted into a byte array
@@ -77,15 +64,12 @@ public class BitcoinUtil {
         return ByteBuffer.allocate(8).putLong(longToConvert).array();
     }
 
-
     /**
-     *
      * Converts a Big Integer to a byte array
      *
      * @param bigIntegerToConvert BigInteger that should be converted into a byte array
      * @param exactArraySize exact size of array
      * @return byte array corresponding to BigInteger
-     *
      **/
     public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert, int exactArraySize) {
         if ((bigIntegerToConvert == null) || (bigIntegerToConvert.signum() == -1)) {// negative
@@ -106,7 +90,6 @@ public class BitcoinUtil {
         return result;
     }
 
-
     /**
      * Converts a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) from a ByteBuffer to byte array
      *
@@ -123,7 +106,6 @@ public class BitcoinUtil {
         byteBuffer.get(varInt, 1, varIntSize - 1);
         return varInt;
     }
-
 
     /**
      * Converts a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) from a ByteBuffer to long
@@ -143,7 +125,6 @@ public class BitcoinUtil {
      * @param varInt byte array containing variable length integer
      * @return BigInteger corresponding to variable length integer
      */
-
     public static BigInteger getVarIntBI(byte[] varInt) {
         BigInteger result = BigInteger.ZERO;
         if (varInt.length == 0) {
@@ -158,7 +139,7 @@ public class BitcoinUtil {
             intSize = 3;
         } else if (unsignedByte == 0xFE) {
             intSize = 5;
-        } else if (unsignedByte == 0XFF) {
+        } else {
             intSize = 9;
         }
         byte[] rawDataInt = reverseByteArray(Arrays.copyOfRange(varInt, 1, intSize));
@@ -171,7 +152,6 @@ public class BitcoinUtil {
      * @param varInt byte array containing variable length integer
      * @return long corresponding to variable length integer
      */
-
     public static long getVarInt(byte[] varInt) {
         long result = 0;
         if (varInt.length == 0) {
@@ -186,7 +166,7 @@ public class BitcoinUtil {
             intSize = 3;
         } else if (unsignedByte == 0xFE) {
             intSize = 5;
-        } else if (unsignedByte == 0XFF) {
+        } else {
             intSize = 9;
         }
         byte[] rawDataInt = reverseByteArray(Arrays.copyOfRange(varInt, 1, intSize));
@@ -195,7 +175,7 @@ public class BitcoinUtil {
             result = byteBuffer.getShort();
         } else if (intSize == 5) {
             result = byteBuffer.getInt();
-        } else if (intSize == 9) {
+        } else {
             result = byteBuffer.getLong(); // Need to handle sign - available only in JDK8
         }
         return result;
@@ -204,10 +184,9 @@ public class BitcoinUtil {
     /**
      * Determines size of a variable length integer (https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer)
      *
-     * @param firstByteVarInt first byte of the variable integeer
+     * @param firstByteVarInt first byte of the variable integer
      * @return byte with the size of the variable int (either 2, 3, 5 or 9) - does include the marker!
      */
-
     public static byte getVarIntSize(byte firstByteVarInt) {
         int unsignedByte = firstByteVarInt & 0xFF;
         if (unsignedByte == 0xFD) {
@@ -222,14 +201,12 @@ public class BitcoinUtil {
         return 1; //<0xFD
     }
 
-
     /**
      * Reads a size from a reversed byte order, such as block size in the block header
      *
      * @param byteSize byte array with a length of exactly 4
      * @return size, returns 0 in case of invalid block size
      */
-
     public static long getSize(byte[] byteSize) {
         if (byteSize.length != 4) {
             return 0;
@@ -254,9 +231,9 @@ public class BitcoinUtil {
         return result;
     }
 
-
     /**
-     * Converts a Hex String to Byte Array. Only used for configuration not for parsing. Hex String is in format of xsd:hexBinary
+     * Converts a Hex String to Byte Array. Only used for configuration not for parsing.
+     * Hex String is in format of xsd:hexBinary
      *
      * @param hexString String in Hex format.
      * @return byte array corresponding to String in Hex format
@@ -267,7 +244,8 @@ public class BitcoinUtil {
 
 
     /**
-     * Converts a Byte Array to Hex String. Only used for configuration not for parsing. Hex String is in format of xsd:hexBinary
+     * Converts a Byte Array to Hex String. Only used for configuration not for parsing.
+     * Hex String is in format of xsd:hexBinary
      *
      * @param byteArray byte array to convert
      * @return String in Hex format corresponding to byteArray
@@ -308,16 +286,19 @@ public class BitcoinUtil {
     }
 
     /**
-     * Calculates the double SHA256-Hash of a transaction in little endian format. This could be used for certain analysis scenario where one want to investigate the referenced transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
+     * Calculates the double SHA256-Hash of a transaction in little endian format.
+     * This could be used for certain analysis scenario where one want to investigate the referenced
+     * transaction used as an input for a Transaction. Furthermore, it can be used as a unique identifier of the transaction
      * <p>
      * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
+     *
      * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-     * @throws java.io.IOException in case of errors reading from the InputStream
-     * @deprecated Use transaction.getTransactionHash()
+     *
+     * @deprecated Use {@link BitcoinTransaction#getTransactionHash()}
      */
-    public static byte[] getTransactionHash(BitcoinTransaction transaction) throws IOException {
+    public static byte[] getTransactionHash(BitcoinTransaction transaction) {
         return transaction.getTransactionHash();
     }
 
@@ -327,11 +308,13 @@ public class BitcoinUtil {
      * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
-     * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-     * @throws java.io.IOException in case of errors reading from the InputStream
-     * @deprecated Use transaction.getTransactionHashSegWit()
+     *
+     * @return byte array containing the hash of the transaction.
+     *          Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+     *
+     * @deprecated Use {@link BitcoinTransaction#getTransactionHashSegwit()}
      */
-    public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) throws IOException {
+    public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) {
         return transaction.getTransactionHashSegwit();
     }
 

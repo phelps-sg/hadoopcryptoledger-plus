@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'jacoco'
@@ -10,7 +11,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.mesonomics"
 archivesBaseName = "hadoopcryptoledger-plus-fileformat"
-version = "0.1"
+version = "0.3"
 
 jar {
     manifest {
@@ -90,13 +91,60 @@ artifacts {
     archives hadoopCryptoLedgerJavaDocs, sourcesJar
 }
 
+signing {
+    sign configurations.archives
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
-//            groupId 'com.github.phelps-sg'
-//            artifactId 'hadoopcryptoledger-plus-fileformat'
-//            version '0.1'
+            artifactId archivesBaseName
             from components.java
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'hadoopcryptoledger-plus'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Fork of ZuInnoTe/hadoopcryptoledger with additional functionality to compute block hashes and addresses as they appear in blockexplorer'
+                url 'https://github.com/phelps-sg/hadoopcryptoledger-plus'
+
+                scm {
+                    connection 'scm:svn:https://github.com/phelps-sg/hadoopcryptoledger-plus.git'
+                    developerConnection'scm:svn:https://github.com/phelps-sg/hadoopcryptoledger-plus.git'
+                    url 'https://github.com/phelps-sg/hadoopcryptoledger-plus'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'phelps-sg'
+                        name 'Steve Phelps'
+                        email 'sphelps@sphelps.net'
+                    }
+                }
+            }
         }
     }
 }
