@@ -17,7 +17,19 @@ cleaner API adhering to object-oriented design principles; in particular:
 - refactoring of duplicated code
 - adherence to Java style guide
 
-## Building
+## Adding to your build
+
+### Maven
+
+~~~xml
+<dependency>
+  <groupId>com.mesonomics</groupId>
+  <artifactId>hadoopcryptoledger-plus-fileformat</artifactId>
+  <version>0.3</version>
+</dependency>
+~~~
+
+## Building the project from source
 
 To build and run all unit and integration tests run:
 
@@ -25,7 +37,7 @@ To build and run all unit and integration tests run:
 gradle build
 ~~~
 
-### Acknowledgements
+## Acknowledgements
 
 The original work was developed by Jörn Franke. Additional code is adapted from the 
 [bitcoinj project](https://github.com/bitcoinj/bitcoinj).
