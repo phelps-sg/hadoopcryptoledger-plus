@@ -41,7 +41,7 @@ public class LittleEndianUInt32 extends Number {
     }
 
     public long getValue() {
-        return rawData.getInt(0) & 0x00000000ffffffffL;
+        return rawData.getInt(0) & MAX;
     }
 
     public ByteBuffer getRawData() {
