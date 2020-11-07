@@ -16,6 +16,8 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -329,9 +331,10 @@ public class BitcoinUtil {
     }
 
     public static byte[] hashTwice(byte[] input) {
-        MessageDigest digest = newDigest();
-        digest.update(input);
-        return digest.digest(digest.digest());
+        return DigestUtils.sha256(DigestUtils.sha256(input));
+//        MessageDigest digest = newDigest();
+//        digest.update(input);
+//        return digest.digest(digest.digest());
     }
 
     public static byte[] hash(byte[] input) {
