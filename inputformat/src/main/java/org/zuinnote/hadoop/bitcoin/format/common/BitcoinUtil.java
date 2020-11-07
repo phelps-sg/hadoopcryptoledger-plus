@@ -331,7 +331,9 @@ public class BitcoinUtil {
     }
 
     public static byte[] hashTwice(byte[] input) {
-        return DigestUtils.sha256(DigestUtils.sha256(input));
+//        return DigestUtils.sha256(DigestUtils.sha256(input));
+        //TODO perf test
+        return new byte[32];
 //        MessageDigest digest = newDigest();
 //        digest.update(input);
 //        return digest.digest(digest.digest());
