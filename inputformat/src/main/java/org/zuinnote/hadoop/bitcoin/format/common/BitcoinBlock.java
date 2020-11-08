@@ -39,6 +39,8 @@ import java.util.ArrayList;
  **/
 public class BitcoinBlock implements Serializable, Writable {
 
+    public static final int HEADER_SIZE_BYTES = 6*32;
+
     private LittleEndianUInt32 blockSize;
     private byte[] magicNo;
     private LittleEndianUInt32 version;
@@ -274,8 +276,8 @@ public class BitcoinBlock implements Serializable, Writable {
     }
 
     public byte[] getHeader() {
+        ByteArrayOutputStream header = new ByteArrayOutputStream();
         try {
-            ByteArrayOutputStream header = new ByteArrayOutputStream();
             header.write(version.getBytes());
             header.write(hashPrevBlock);
             header.write(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
@@ -284,7 +286,7 @@ public class BitcoinBlock implements Serializable, Writable {
             header.write(nonce.getBytes());
             return header.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException(e);  // Should never happen
+            throw new RuntimeException(e);  // Never happens
         }
     }
 }
