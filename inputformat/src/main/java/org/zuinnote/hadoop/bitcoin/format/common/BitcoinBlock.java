@@ -276,13 +276,17 @@ public class BitcoinBlock implements Serializable, Writable {
     }
 
     public byte[] getHeader() {
-        ByteBuffer header = ByteBuffer.allocate(HEADER_SIZE_BYTES);
-        header.put(version.getBytes());
-        header.put(hashPrevBlock);
-        header.put(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
-        header.put(time.getBytes());
-        header.put(bits.getBytes());
-        header.put(nonce.getBytes());
-        return header.array();
+        ByteArrayOutputStream header = new ByteArrayOutputStream();
+        try {
+            header.write(version.getBytes());
+            header.write(hashPrevBlock);
+            header.write(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
+            header.write(time.getBytes());
+            header.write(bits.getBytes());
+            header.write(nonce.getBytes());
+            return header.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Never happens
+        }
     }
 }
