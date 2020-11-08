@@ -33,7 +33,7 @@ import java.util.ArrayList;
  *
  * <p>
  * It contains modified code from
- *  <https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java>
+ *  <a href="https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java">Block.java</a>
  *  by Andreas Schildbach.
  *  </p>
  **/
