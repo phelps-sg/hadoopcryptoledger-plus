@@ -16,8 +16,6 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -29,6 +27,8 @@ import java.util.Date;
 
 
 public class BitcoinUtil {
+
+    public static final MessageDigest digestPrototype = BitcoinUtil.SHA256digest();
 
     private BitcoinUtil() {
     }
@@ -331,15 +331,22 @@ public class BitcoinUtil {
     }
 
     public static byte[] hashTwice(byte[] input) {
-        return DigestUtils.sha256(DigestUtils.sha256(input));
-//        MessageDigest digest = newDigest();
-//        digest.update(input);
-//        return digest.digest(digest.digest());
+        MessageDigest digest = newDigest();
+        digest.update(input);
+        return digest.digest(digest.digest());
     }
 
     public static byte[] hash(byte[] input) {
         MessageDigest digest = newDigest();
         return digest.digest(input);
+    }
+
+    public static final MessageDigest newDigest() {
+        try {
+            return (MessageDigest) digestPrototype.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -350,7 +357,7 @@ public class BitcoinUtil {
      *
      * @return a new SHA-256 MessageDigest instance
      */
-    public static MessageDigest newDigest() {
+    public static MessageDigest SHA256digest() {
         try {
             return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
