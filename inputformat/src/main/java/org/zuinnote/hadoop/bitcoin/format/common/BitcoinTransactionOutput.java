@@ -21,10 +21,12 @@ import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class BitcoinTransactionOutput implements Serializable {
+public class BitcoinTransactionOutput implements Serializable, Byteable {
 
     private static final long serialVersionUID = 2854570630540937753L;
 
@@ -63,4 +65,16 @@ public class BitcoinTransactionOutput implements Serializable {
         return getToAddress().toString();
     }
 
+    @Override
+    public byte[] getBytes() {
+        try {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            buffer.write(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8));
+            buffer.write(getTxOutScriptLength());
+            buffer.write(getTxOutScript());
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
