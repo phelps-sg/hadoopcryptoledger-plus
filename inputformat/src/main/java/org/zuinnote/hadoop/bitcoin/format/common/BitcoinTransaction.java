@@ -167,26 +167,24 @@ public class BitcoinTransaction implements Serializable, Writable {
      *
 	 * @return byte array containing the hash of the transaction.
 	 */
-	public byte[] getTransactionHash() {
+    public byte[] getTransactionHash() {
         try {
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			buffer.write(version.getBytes());
-			byte[] inCounter = getInCounter();
-			buffer.write(inCounter);
-			for (BitcoinTransactionInput input : inputs) {
-				buffer.write(input.getBytes());
-			}
-			byte[] outCounter = getOutCounter();
-			buffer.write(outCounter);
-			for (BitcoinTransactionOutput output: outputs) {
-				buffer.write(output.getBytes());
-			}
-			buffer.write(lockTime.getBytes());
-			return BitcoinUtil.hashTwice(buffer.toByteArray());
-		} catch (IOException e) {
-        	throw new RuntimeException(e);  // ByteArrayOutputStream never throws IOException
-		}
-	}
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            buffer.write(version.getBytes());
+            buffer.write(inCounter);
+            for (BitcoinTransactionInput input : inputs) {
+                buffer.write(input.getBytes());
+            }
+            buffer.write(outCounter);
+            for (BitcoinTransactionOutput output : outputs) {
+                buffer.write(output.getBytes());
+            }
+            buffer.write(lockTime.getBytes());
+            return BitcoinUtil.hashTwice(buffer.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // ByteArrayOutputStream never throws IOException
+        }
+    }
 
 	/**
 	 * <p>
@@ -230,12 +228,10 @@ public class BitcoinTransaction implements Serializable, Writable {
 				buffer.write(getMarker());
 				buffer.write(getFlag());
 			}
-			byte[] inCounter = getInCounter();
 			buffer.write(inCounter);
 			for (BitcoinTransactionInput input : inputs) {
 				buffer.write(input.getBytes());
 			}
-			byte[] outCounter = getOutCounter();
 			buffer.write(outCounter);
 			for (BitcoinTransactionOutput output : outputs) {
 				buffer.write(output.getBytes());
