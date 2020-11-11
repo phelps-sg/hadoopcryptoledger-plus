@@ -1,4 +1,4 @@
-package org.zuinnote.hadoop.bitcoin.format.common;
+package org.zuinnote.hadoop.bitcoin.format.util;
 
 public interface Byteable {
     byte[] getBytes();

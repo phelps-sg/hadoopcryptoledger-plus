@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ */
 package org.zuinnote.hadoop.bitcoin.format.common;
+
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,7 +25,7 @@ import java.util.List;
  *
  *
  */
-public class BitcoinScriptWitnessItem implements Serializable {
+public class BitcoinScriptWitnessItem implements Serializable, Byteable {
 
     /**
      *
@@ -42,5 +45,10 @@ public class BitcoinScriptWitnessItem implements Serializable {
 
     public List<BitcoinScriptWitness> getScriptWitnessList() {
         return this.scriptWitnessList;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return new Bytes(stackItemCounter, scriptWitnessList).getBytes();
     }
 }

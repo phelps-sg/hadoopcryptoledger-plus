@@ -19,6 +19,7 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Writable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -168,22 +169,7 @@ public class BitcoinTransaction implements Serializable, Writable {
 	 * @return byte array containing the hash of the transaction.
 	 */
     public byte[] getTransactionHash() {
-        try {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            buffer.write(version.getBytes());
-            buffer.write(inCounter);
-            for (BitcoinTransactionInput input : inputs) {
-                buffer.write(input.getBytes());
-            }
-            buffer.write(outCounter);
-            for (BitcoinTransactionOutput output : outputs) {
-                buffer.write(output.getBytes());
-            }
-            buffer.write(lockTime.getBytes());
-            return BitcoinUtil.hashTwice(buffer.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);  // ByteArrayOutputStream never throws IOException
-        }
+        return new Bytes(version, inCounter, inputs, outCounter, outputs, lockTime).hashTwice();
     }
 
 	/**
@@ -198,9 +184,8 @@ public class BitcoinTransaction implements Serializable, Writable {
 	 * @return byte array containing the hash of the transaction.
 	 */
 	public byte[] getTransactionHashSegwit() {
-	    try {
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			buffer.write(version.getBytes());
+			Bytes buffer = new Bytes();
+			buffer.write(version);
 			// check if segwit
 			boolean segwit = false;
 			if ((getMarker() == 0) && (getFlag() != 0)) {
@@ -212,12 +197,10 @@ public class BitcoinTransaction implements Serializable, Writable {
 				// represented by a 0x00. If all txins are not witness program, a transaction's
 				// wtxid is equal to its txid.
 				boolean emptyWitness = true;
-				for (int k = 0; k < getBitcoinScriptWitness().size(); k++) {
-					BitcoinScriptWitnessItem currentItem = getBitcoinScriptWitness().get(k);
-					if (currentItem.getStackItemCounter().length > 1) {
-						emptyWitness = false;
-						break;
-					} else if ((currentItem.getStackItemCounter().length == 1) && (currentItem.getStackItemCounter()[0] != 0x00)) {
+				for (BitcoinScriptWitnessItem currentItem: scriptWitnessItems) {
+					if (currentItem.getStackItemCounter().length > 1
+                        || ((currentItem.getStackItemCounter().length == 1)
+                                && (currentItem.getStackItemCounter()[0] != 0x00))) {
 						emptyWitness = false;
 						break;
 					}
@@ -225,31 +208,14 @@ public class BitcoinTransaction implements Serializable, Writable {
 				if (emptyWitness) {
 					return getTransactionHash();
 				}
-				buffer.write(getMarker());
-				buffer.write(getFlag());
+				buffer.write(marker, flag);
 			}
-			buffer.write(inCounter);
-			for (BitcoinTransactionInput input : inputs) {
-				buffer.write(input.getBytes());
-			}
-			buffer.write(outCounter);
-			for (BitcoinTransactionOutput output : outputs) {
-				buffer.write(output.getBytes());
-			}
+			buffer.write(inCounter, inputs, outCounter, outputs);
 			if (segwit) {
-                for (BitcoinScriptWitnessItem item : scriptWitnessItems) {
-                    buffer.write(item.getStackItemCounter());
-                    for (BitcoinScriptWitness witness : item.getScriptWitnessList()) {
-                        buffer.write(witness.getWitnessScriptLength());
-                        buffer.write(witness.getWitnessScript());
-                    }
-                }
+			    buffer.write(scriptWitnessItems);
             }
-			buffer.write(lockTime.getBytes());
-			return BitcoinUtil.hashTwice(buffer.toByteArray());
-		} catch (IOException e) {
-	    	throw new RuntimeException(e);
-		}
+			buffer.write(lockTime);
+			return buffer.hashTwice();
 	}
 
 }

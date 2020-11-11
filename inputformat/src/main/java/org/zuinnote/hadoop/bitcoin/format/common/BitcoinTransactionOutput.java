@@ -20,9 +20,9 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -67,14 +67,8 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
 
     @Override
     public byte[] getBytes() {
-        try {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            buffer.write(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8));
-            buffer.write(getTxOutScriptLength());
-            buffer.write(getTxOutScript());
-            return buffer.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new Bytes(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8),
+                            txOutScriptLength, txOutScript).getBytes();
     }
+
 }

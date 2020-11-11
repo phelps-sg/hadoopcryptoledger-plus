@@ -16,8 +16,9 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
+
 import java.io.Serializable;
 
 public class BitcoinTransactionInput implements Serializable, Byteable {
@@ -60,17 +61,9 @@ public class BitcoinTransactionInput implements Serializable, Byteable {
 
     @Override
     public byte[] getBytes() {
-        try {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            buffer.write(prevTransactionHash);
-            buffer.write(previousTxOutIndex.getBytes());
-            buffer.write(txInScriptLength);
-            buffer.write(txInScript);
-            buffer.write(seqNo.getBytes());
-            return buffer.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new Bytes(prevTransactionHash, previousTxOutIndex, txInScriptLength,
+                            txInScript, seqNo)
+                .getBytes();
     }
 
 }
