@@ -158,7 +158,7 @@ public class BitcoinBlockReader {
         result.setTime(currentTime);
         result.setBits(currentBits);
         result.setNonce(currentNonce);
-        result.setTransactionCounter(currentTransactionCounter);
+//        result.setTransactionCounter(currentTransactionCounter);
         result.setHashPrevBlock(currentHashPrevBlock);
         result.setHashMerkleRoot(currentHashMerkleRoot);
         result.setAuxPOW(auxPOW);

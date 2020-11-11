@@ -48,13 +48,11 @@ public class BitcoinBlock implements Serializable, Writable {
     private LittleEndianUInt32 nonce;
     private byte[] hashPrevBlock;
     private byte[] hashMerkleRoot;
-    private long transactionCounter;
     private List<BitcoinTransaction> transactions;
     private BitcoinAuxPOW auxPOW;
 
     public BitcoinBlock() {
         this.magicNo = new byte[0];
-        this.transactionCounter = 0;
         this.hashPrevBlock = new byte[0];
         this.hashMerkleRoot = new byte[0];
         this.transactions = new ArrayList<>();
@@ -111,15 +109,6 @@ public class BitcoinBlock implements Serializable, Writable {
         this.nonce = nonce;
     }
 
-    public long getTransactionCounter() {
-        return this.transactionCounter;
-    }
-
-
-    public void setTransactionCounter(long transactionCounter) {
-        this.transactionCounter = transactionCounter;
-    }
-
     public byte[] getHashPrevBlock() { return this.hashPrevBlock; }
 
     public String getHashPrevBlockString() {
@@ -162,7 +151,6 @@ public class BitcoinBlock implements Serializable, Writable {
         this.time = newBitcoinBlock.getTime();
         this.bits = newBitcoinBlock.getBits();
         this.nonce = newBitcoinBlock.getNonce();
-        this.transactionCounter = newBitcoinBlock.getTransactionCounter();
         this.hashPrevBlock = newBitcoinBlock.getHashPrevBlock();
         this.hashMerkleRoot = newBitcoinBlock.getHashMerkleRoot();
         this.transactions = newBitcoinBlock.getTransactions();
