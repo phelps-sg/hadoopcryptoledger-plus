@@ -19,9 +19,8 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import java.io.*;
 
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.file.tfile.ByteArray;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -268,25 +267,15 @@ public class BitcoinBlock implements Serializable, Writable {
     }
 
     public byte[] getHash() {
-        return BitcoinUtil.reverseByteArray(BitcoinUtil.hashTwice(getHeader()));
+        return BitcoinUtil.reverseByteArray(getHeader().hashTwice());
     }
 
     public String getHashString() {
         return BitcoinUtil.convertByteArrayToHexString(getHash());
     }
 
-    public byte[] getHeader() {
-        ByteArrayOutputStream header = new ByteArrayOutputStream();
-        try {
-            header.write(version.getBytes());
-            header.write(hashPrevBlock);
-            header.write(BitcoinUtil.reverseByteArray(calculateMerkleRoot()));
-            header.write(time.getBytes());
-            header.write(bits.getBytes());
-            header.write(nonce.getBytes());
-            return header.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);  // Never happens
-        }
+    public Bytes getHeader() {
+        return new Bytes(version, hashPrevBlock, BitcoinUtil.reverseByteArray(calculateMerkleRoot()),
+                            time, bits, nonce);
     }
 }

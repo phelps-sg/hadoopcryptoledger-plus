@@ -16,7 +16,11 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+
 import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -24,7 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
-
+import java.util.List;
 
 public class BitcoinUtil {
 
@@ -362,6 +366,18 @@ public class BitcoinUtil {
             return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);  // Can't happen.
+        }
+    }
+
+    public static byte[] getBytes(List<Byteable> sources) {
+        try {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            for (Byteable source : sources) {
+                buffer.write(source.getBytes());
+            }
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -20,11 +20,13 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class BitcoinTransactionOutput implements Serializable {
+public class BitcoinTransactionOutput implements Serializable, Byteable {
 
     private static final long serialVersionUID = 2854570630540937753L;
 
@@ -61,6 +63,12 @@ public class BitcoinTransactionOutput implements Serializable {
 
     public String getToAddressString() {
         return getToAddress().toString();
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return new Bytes(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8),
+                            txOutScriptLength, txOutScript).getBytes();
     }
 
 }

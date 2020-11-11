@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 ZuInnoTe (Jörn Franke) <zuinnote@gmail.com>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,27 +16,27 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
+
 import java.io.Serializable;
 
-public class BitcoinTransactionInput implements Serializable {
+public class BitcoinTransactionInput implements Serializable, Byteable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 283893453089295979L;
 
     private byte[] prevTransactionHash;
-    private long previousTxOutIndex;
+    private LittleEndianUInt32 previousTxOutIndex;
     private byte[] txInScriptLength;
     private byte[] txInScript;
-    private long seqNo;
+    private LittleEndianUInt32 seqNo;
 
     public BitcoinTransactionInput(byte[] prevTransactionHash, long previousTxOutIndex, byte[] txInScriptLength, byte[] txInScript, long seqNo) {
         this.prevTransactionHash = prevTransactionHash;
-        this.previousTxOutIndex = previousTxOutIndex;
+        this.previousTxOutIndex = new LittleEndianUInt32(previousTxOutIndex);
         this.txInScriptLength = txInScriptLength;
         this.txInScript = txInScript;
-        this.seqNo = seqNo;
+        this.seqNo = new LittleEndianUInt32(seqNo);
     }
 
     public byte[] getPrevTransactionHash() {
@@ -44,7 +44,7 @@ public class BitcoinTransactionInput implements Serializable {
     }
 
     public long getPreviousTxOutIndex() {
-        return this.previousTxOutIndex;
+        return this.previousTxOutIndex.getValue();
     }
 
     public byte[] getTxInScriptLength() {
@@ -56,7 +56,14 @@ public class BitcoinTransactionInput implements Serializable {
     }
 
     public long getSeqNo() {
-        return this.seqNo;
+        return this.seqNo.getValue();
+    }
+
+    @Override
+    public byte[] getBytes() {
+        return new Bytes(prevTransactionHash, previousTxOutIndex, txInScriptLength,
+                            txInScript, seqNo)
+                .getBytes();
     }
 
 }

@@ -19,6 +19,7 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Writable;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,28 +28,28 @@ import java.util.List;
 
 public class BitcoinTransaction implements Serializable, Writable {
 
-    private int version;
+    private LittleEndianUInt32 version;
     private byte marker;
     private byte flag;
     private byte[] inCounter;
     private byte[] outCounter;
-    private List<BitcoinTransactionInput> listOfInputs;
-    private List<BitcoinTransactionOutput> listOfOutputs;
-    private List<BitcoinScriptWitnessItem> listOfScriptWitnessItem;
-    private int lockTime;
+    private List<BitcoinTransactionInput> inputs;
+    private List<BitcoinTransactionOutput> outputs;
+    private List<BitcoinScriptWitnessItem> scriptWitnessItems;
+    private LittleEndianUInt32 lockTime;
 
 	private static transient final Log LOG = LogFactory.getLog(BitcoinTransaction.class.getName());
 
     public BitcoinTransaction() {
-        this.version = 0;
+        this.version = new LittleEndianUInt32(0);
         this.marker = 1;
         this.flag = 0;
         this.inCounter = new byte[0];
         this.outCounter = new byte[0];
-        this.listOfInputs = new ArrayList<>();
-        this.listOfOutputs = new ArrayList<>();
-        this.listOfScriptWitnessItem = new ArrayList<>();
-        this.lockTime = 0;
+        this.inputs = new ArrayList<>();
+        this.outputs = new ArrayList<>();
+        this.scriptWitnessItems = new ArrayList<>();
+        this.lockTime = new LittleEndianUInt32(0);
     }
 
     /**
@@ -61,17 +62,17 @@ public class BitcoinTransaction implements Serializable, Writable {
      * @param listOfOutputs
      * @param lockTime
      */
-    public BitcoinTransaction(int version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, int lockTime) {
+    public BitcoinTransaction(long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, long lockTime) {
 
         this.marker = 1;
         this.flag = 0;
-        this.version = version;
+        this.version = new LittleEndianUInt32(version);
         this.inCounter = inCounter;
-        this.listOfInputs = listOfInputs;
+        this.inputs = listOfInputs;
         this.outCounter = outCounter;
-        this.listOfOutputs = listOfOutputs;
-        this.listOfScriptWitnessItem = new ArrayList<>();
-        this.lockTime = lockTime;
+        this.outputs = listOfOutputs;
+        this.scriptWitnessItems = new ArrayList<>();
+        this.lockTime = new LittleEndianUInt32(lockTime);
     }
 
 
@@ -88,20 +89,20 @@ public class BitcoinTransaction implements Serializable, Writable {
      * @param listOfScriptWitnessItem
      * @param lockTime
      */
-    public BitcoinTransaction(byte marker, byte flag, int version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, List<BitcoinScriptWitnessItem> listOfScriptWitnessItem, int lockTime) {
+    public BitcoinTransaction(byte marker, byte flag, long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, List<BitcoinScriptWitnessItem> listOfScriptWitnessItem, long lockTime) {
         this.marker = marker;
         this.flag = flag;
-        this.version = version;
+        this.version = new LittleEndianUInt32(version);
         this.inCounter = inCounter;
-        this.listOfInputs = listOfInputs;
+        this.inputs = listOfInputs;
         this.outCounter = outCounter;
-        this.listOfOutputs = listOfOutputs;
-        this.listOfScriptWitnessItem = listOfScriptWitnessItem;
-        this.lockTime = lockTime;
+        this.outputs = listOfOutputs;
+        this.scriptWitnessItems = listOfScriptWitnessItem;
+        this.lockTime = new LittleEndianUInt32(lockTime);
     }
 
-    public int getVersion() {
-        return this.version;
+    public long getVersion() {
+        return this.version.longValue();
     }
 
     public byte getMarker() {
@@ -117,7 +118,7 @@ public class BitcoinTransaction implements Serializable, Writable {
     }
 
     public List<BitcoinTransactionInput> getListOfInputs() {
-        return this.listOfInputs;
+        return this.inputs;
     }
 
     public byte[] getOutCounter() {
@@ -125,27 +126,27 @@ public class BitcoinTransaction implements Serializable, Writable {
     }
 
     public List<BitcoinTransactionOutput> getListOfOutputs() {
-        return this.listOfOutputs;
+        return this.outputs;
     }
 
     public List<BitcoinScriptWitnessItem> getBitcoinScriptWitness() {
-        return this.listOfScriptWitnessItem;
+        return this.scriptWitnessItems;
     }
 
-    public int getLockTime() {
-        return this.lockTime;
+    public long getLockTime() {
+        return this.lockTime.getValue();
     }
 
     public void set(BitcoinTransaction newTransaction) {
-        this.version = newTransaction.getVersion();
+        this.version = new LittleEndianUInt32(newTransaction.getVersion());
         this.marker = newTransaction.getMarker();
         this.flag = newTransaction.getFlag();
         this.inCounter = newTransaction.getInCounter();
-        this.listOfInputs = newTransaction.getListOfInputs();
+        this.inputs = newTransaction.getListOfInputs();
         this.outCounter = newTransaction.getOutCounter();
-        this.listOfOutputs = newTransaction.getListOfOutputs();
-        this.listOfScriptWitnessItem = newTransaction.getBitcoinScriptWitness();
-        this.lockTime = newTransaction.getLockTime();
+        this.outputs = newTransaction.getListOfOutputs();
+        this.scriptWitnessItems = newTransaction.getBitcoinScriptWitness();
+        this.lockTime = new LittleEndianUInt32(newTransaction.getLockTime());
 
     }
 
@@ -167,34 +168,9 @@ public class BitcoinTransaction implements Serializable, Writable {
      *
 	 * @return byte array containing the hash of the transaction.
 	 */
-	public byte[] getTransactionHash() {
-        try {
-			ByteArrayOutputStream transactionBAOS = new ByteArrayOutputStream();
-			byte[] version = BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray(getVersion()));
-			transactionBAOS.write(version);
-			byte[] inCounter = getInCounter();
-			transactionBAOS.write(inCounter);
-			for (int i = 0; i < getListOfInputs().size(); i++) {
-				transactionBAOS.write(getListOfInputs().get(i).getPrevTransactionHash());
-				transactionBAOS.write(BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray((int) (getListOfInputs().get(i).getPreviousTxOutIndex()))));
-				transactionBAOS.write(getListOfInputs().get(i).getTxInScriptLength());
-				transactionBAOS.write(getListOfInputs().get(i).getTxInScript());
-				transactionBAOS.write(BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray((int) (getListOfInputs().get(i).getSeqNo()))));
-			}
-			byte[] outCounter = getOutCounter();
-			transactionBAOS.write(outCounter);
-			for (int j = 0; j < getListOfOutputs().size(); j++) {
-				transactionBAOS.write(BitcoinUtil.convertBigIntegerToByteArray(getListOfOutputs().get(j).getValue(), 8));
-				transactionBAOS.write(getListOfOutputs().get(j).getTxOutScriptLength());
-				transactionBAOS.write(getListOfOutputs().get(j).getTxOutScript());
-			}
-			byte[] lockTime = BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray(getLockTime()));
-			transactionBAOS.write(lockTime);
-			return BitcoinUtil.hashTwice(transactionBAOS.toByteArray());
-		} catch (IOException e) {
-        	throw new RuntimeException(e);  // ByteArrayOutputStream never throws IOException
-		}
-	}
+    public byte[] getTransactionHash() {
+        return new Bytes(version, inCounter, inputs, outCounter, outputs, lockTime).hashTwice();
+    }
 
 	/**
 	 * <p>
@@ -208,10 +184,8 @@ public class BitcoinTransaction implements Serializable, Writable {
 	 * @return byte array containing the hash of the transaction.
 	 */
 	public byte[] getTransactionHashSegwit() {
-	    try {
-			ByteArrayOutputStream transactionBAOS = new ByteArrayOutputStream();
-			byte[] version = BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray(getVersion()));
-			transactionBAOS.write(version);
+			Bytes buffer = new Bytes();
+			buffer.write(version);
 			// check if segwit
 			boolean segwit = false;
 			if ((getMarker() == 0) && (getFlag() != 0)) {
@@ -223,54 +197,25 @@ public class BitcoinTransaction implements Serializable, Writable {
 				// represented by a 0x00. If all txins are not witness program, a transaction's
 				// wtxid is equal to its txid.
 				boolean emptyWitness = true;
-				for (int k = 0; k < getBitcoinScriptWitness().size(); k++) {
-					BitcoinScriptWitnessItem currentItem = getBitcoinScriptWitness().get(k);
-					if (currentItem.getStackItemCounter().length > 1) {
-						emptyWitness = false;
-						break;
-					} else if ((currentItem.getStackItemCounter().length == 1) && (currentItem.getStackItemCounter()[0] != 0x00)) {
+				for (BitcoinScriptWitnessItem currentItem: scriptWitnessItems) {
+					if (currentItem.getStackItemCounter().length > 1
+                        || ((currentItem.getStackItemCounter().length == 1)
+                                && (currentItem.getStackItemCounter()[0] != 0x00))) {
 						emptyWitness = false;
 						break;
 					}
 				}
 				if (emptyWitness) {
-					return getTransactionHashSegwit();
+					return getTransactionHash();
 				}
-				transactionBAOS.write(getMarker());
-				transactionBAOS.write(getFlag());
+				buffer.write(marker, flag);
 			}
-			byte[] inCounter = getInCounter();
-			transactionBAOS.write(inCounter);
-			for (int i = 0; i < getListOfInputs().size(); i++) {
-				transactionBAOS.write(getListOfInputs().get(i).getPrevTransactionHash());
-				transactionBAOS.write(BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray((int) (getListOfInputs().get(i).getPreviousTxOutIndex()))));
-				transactionBAOS.write(getListOfInputs().get(i).getTxInScriptLength());
-				transactionBAOS.write(getListOfInputs().get(i).getTxInScript());
-				transactionBAOS.write(BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray((int) (getListOfInputs().get(i).getSeqNo()))));
-			}
-			byte[] outCounter = getOutCounter();
-			transactionBAOS.write(outCounter);
-			for (int j = 0; j < getListOfOutputs().size(); j++) {
-				transactionBAOS.write(BitcoinUtil.convertBigIntegerToByteArray(getListOfOutputs().get(j).getValue(), 8));
-				transactionBAOS.write(getListOfOutputs().get(j).getTxOutScriptLength());
-				transactionBAOS.write(getListOfOutputs().get(j).getTxOutScript());
-			}
+			buffer.write(inCounter, inputs, outCounter, outputs);
 			if (segwit) {
-				for (int k = 0; k < getBitcoinScriptWitness().size(); k++) {
-					BitcoinScriptWitnessItem currentItem = getBitcoinScriptWitness().get(k);
-					transactionBAOS.write(currentItem.getStackItemCounter());
-					for (int l = 0; l < currentItem.getScriptWitnessList().size(); l++) {
-						transactionBAOS.write(currentItem.getScriptWitnessList().get(l).getWitnessScriptLength());
-						transactionBAOS.write(currentItem.getScriptWitnessList().get(l).getWitnessScript());
-					}
-				}
-			}
-			byte[] lockTime = BitcoinUtil.reverseByteArray(BitcoinUtil.convertIntToByteArray(getLockTime()));
-			transactionBAOS.write(lockTime);
-			return BitcoinUtil.hashTwice(transactionBAOS.toByteArray());
-		} catch (IOException e) {
-	    	throw new RuntimeException(e);
-		}
+			    buffer.write(scriptWitnessItems);
+            }
+			buffer.write(lockTime);
+			return buffer.hashTwice();
 	}
 
 }
