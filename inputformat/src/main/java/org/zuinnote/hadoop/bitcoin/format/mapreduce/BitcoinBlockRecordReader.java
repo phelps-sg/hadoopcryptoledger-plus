@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import org.zuinnote.hadoop.bitcoin.format.common.*;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 
 /**
  * Reads records as blocks of the bitcoin blockchain. Note that it can be tricky to find the start of a block in a split. The BitcoinBlockReader provides a method (seekBlockStart) for this.
@@ -88,8 +89,8 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
             if (dataBlock == null) {
                 return false;
             }
-            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot();
-            byte[] hashPrevBlock = dataBlock.getHashPrevBlock();
+            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot().getBytes();
+            byte[] hashPrevBlock = dataBlock.getHashPrevBlock().getBytes();
             byte[] newKey = new byte[hashMerkleRoot.length + hashPrevBlock.length];
             for (int i = 0; i < hashMerkleRoot.length; i++) {
                 newKey[i] = hashMerkleRoot[i];

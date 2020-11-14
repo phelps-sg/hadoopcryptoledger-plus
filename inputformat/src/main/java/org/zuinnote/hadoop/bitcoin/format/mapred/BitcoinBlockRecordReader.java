@@ -92,8 +92,8 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
             if (dataBlock == null) {
                 return false;
             }
-            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot();
-            byte[] hashPrevBlock = dataBlock.getHashPrevBlock();
+            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot().getBytes();
+            byte[] hashPrevBlock = dataBlock.getHashPrevBlock().getBytes();
             byte[] newKey = new byte[hashMerkleRoot.length + hashPrevBlock.length];
             for (int i = 0; i < hashMerkleRoot.length; i++) {
                 newKey[i] = hashMerkleRoot[i];

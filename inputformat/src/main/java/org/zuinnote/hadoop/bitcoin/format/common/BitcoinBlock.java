@@ -20,6 +20,7 @@ import java.io.*;
 
 import org.apache.hadoop.io.Writable;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
@@ -41,26 +42,18 @@ import java.util.ArrayList;
  **/
 public class BitcoinBlock implements Serializable, Writable {
 
-    public static final int HEADER_SIZE_BYTES = 6*32;
-
     private UInt32 blockSize;
-//    private byte[] magicNo;
     private Magic magicNo;
     private UInt32 version;
     private EpochDatetime time;
     private UInt32 bits;
     private UInt32 nonce;
-    private byte[] hashPrevBlock;
-    private byte[] hashMerkleRoot;
+    private HashSHA256 hashPrevBlock;
+    private HashSHA256 hashMerkleRoot;
     private List<BitcoinTransaction> transactions;
     private BitcoinAuxPOW auxPOW;
 
     public BitcoinBlock() {
-        this.magicNo = new Magic(0);
-        this.hashPrevBlock = new byte[0];
-        this.hashMerkleRoot = new byte[0];
-        this.transactions = new ArrayList<>();
-        this.auxPOW = new BitcoinAuxPOW();
     }
 
     public UInt32 getBlockSize() {
@@ -111,21 +104,21 @@ public class BitcoinBlock implements Serializable, Writable {
         this.nonce = nonce;
     }
 
-    public byte[] getHashPrevBlock() { return this.hashPrevBlock; }
+    public HashSHA256 getHashPrevBlock() { return this.hashPrevBlock; }
 
     public String getHashPrevBlockString() {
-        return BitcoinUtil.convertByteArrayToHexString(getHashPrevBlock());
+        return getHashPrevBlock().toString();
     }
 
-    public void setHashPrevBlock(byte[] hashPrevBlock) {
+    public void setHashPrevBlock(HashSHA256 hashPrevBlock) {
         this.hashPrevBlock = hashPrevBlock;
     }
 
-    public byte[] getHashMerkleRoot() {
+    public HashSHA256 getHashMerkleRoot() {
         return this.hashMerkleRoot;
     }
 
-    public void setHashMerkleRoot(byte[] hashMerkleRoot) {
+    public void setHashMerkleRoot(HashSHA256 hashMerkleRoot) {
         this.hashMerkleRoot = hashMerkleRoot;
     }
 
@@ -140,7 +133,6 @@ public class BitcoinBlock implements Serializable, Writable {
     public BitcoinAuxPOW getAuxPOW() {
         return this.auxPOW;
     }
-
 
     public void setAuxPOW(BitcoinAuxPOW auxPOW) {
         this.auxPOW = auxPOW;
@@ -256,12 +248,12 @@ public class BitcoinBlock implements Serializable, Writable {
         return tree.get(tree.size() - 1);
     }
 
-    public byte[] getHash() {
-        return BitcoinUtil.reverseByteArray(getHeader().hashTwice());
+    public HashSHA256 getHash() {
+        return new HashSHA256(getHeader());
     }
 
     public String getHashString() {
-        return BitcoinUtil.convertByteArrayToHexString(getHash());
+        return getHash().toString();
     }
 
     public Bytes getHeader() {

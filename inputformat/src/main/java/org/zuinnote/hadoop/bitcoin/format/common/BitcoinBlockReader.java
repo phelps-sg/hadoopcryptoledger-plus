@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
@@ -122,30 +123,16 @@ public class BitcoinBlockReader {
             return null;
         }
         // start parsing
-        // initialize byte arrays
-//        byte[] currentMagicNo = new byte[4];
-        byte[] currentHashMerkleRoot = new byte[32];
-        byte[] currentHashPrevBlock = new byte[32];
-        // magic no
         Magic currentMagicNo = new Magic(rawByteBuffer);
-//        rawByteBuffer.get(currentMagicNo, 0, 4);
-        // blocksize
         UInt32 currentBlockSize = new UInt32(rawByteBuffer);
-        // version
         UInt32 currentVersion = new UInt32(rawByteBuffer);
-        // hashPrevBlock
-        rawByteBuffer.get(currentHashPrevBlock, 0, 32);
-        // hashMerkleRoot
-        rawByteBuffer.get(currentHashMerkleRoot, 0, 32);
-        // time
+        HashSHA256 currentHashPrevBlock = new HashSHA256(rawByteBuffer);
+        HashSHA256 currentHashMerkleRoot = new HashSHA256(rawByteBuffer);
         EpochDatetime currentTime = new EpochDatetime(rawByteBuffer);
-        // bits/difficulty
         UInt32 currentBits = new UInt32(rawByteBuffer);
-        // nonce
         UInt32 currentNonce = new UInt32(rawByteBuffer);
-
-        // parse AuxPOW (if available)
         BitcoinAuxPOW auxPOW = parseAuxPow(rawByteBuffer);
+
         // read var int from transaction counter
         long currentTransactionCounter = BitcoinUtil.convertVarIntByteBufferToLong(rawByteBuffer);
 
@@ -154,6 +141,7 @@ public class BitcoinBlockReader {
         if (allBlockTransactions.size() != currentTransactionCounter) {
             throw new BitcoinBlockReadException("Error: Number of Transactions (" + allBlockTransactions.size() + ") does not correspond to transaction counter in block (" + currentTransactionCounter + ")");
         }
+
         BitcoinBlock result = new BitcoinBlock();
         result.setMagicNo(currentMagicNo);
         result.setBlockSize(currentBlockSize);
