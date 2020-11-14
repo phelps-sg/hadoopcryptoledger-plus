@@ -118,42 +118,30 @@ public class BitcoinBlockReader {
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors of reading the Bitcoin Blockchain data
      */
     public BitcoinBlock readBlock() throws IOException {
-        ByteBuffer rawByteBuffer = readRawBlock();
-        if (rawByteBuffer == null) {
+
+        ByteBuffer buffer = readRawBlock();
+        if (buffer == null) {
             return null;
         }
-        // start parsing
-        Magic currentMagicNo = new Magic(rawByteBuffer);
-        UInt32 currentBlockSize = new UInt32(rawByteBuffer);
-        UInt32 currentVersion = new UInt32(rawByteBuffer);
-        HashSHA256 currentHashPrevBlock = new HashSHA256(rawByteBuffer);
-        HashSHA256 currentHashMerkleRoot = new HashSHA256(rawByteBuffer);
-        EpochDatetime currentTime = new EpochDatetime(rawByteBuffer);
-        UInt32 currentBits = new UInt32(rawByteBuffer);
-        UInt32 currentNonce = new UInt32(rawByteBuffer);
-        BitcoinAuxPOW auxPOW = parseAuxPow(rawByteBuffer);
 
-        // read var int from transaction counter
-        long currentTransactionCounter = BitcoinUtil.convertVarIntByteBufferToLong(rawByteBuffer);
+        Magic magicNo = new Magic(buffer);
+        UInt32 blockSize = new UInt32(buffer);
+        UInt32 version = new UInt32(buffer);
+        HashSHA256 hashPrevBlock = new HashSHA256(buffer);
+        HashSHA256 hashMerkleRoot = new HashSHA256(buffer);
+        EpochDatetime time = new EpochDatetime(buffer);
+        UInt32 bits = new UInt32(buffer);
+        UInt32 nonce = new UInt32(buffer);
+        BitcoinAuxPOW auxPOW = parseAuxPow(buffer);
+        long transactionCounter = BitcoinUtil.convertVarIntByteBufferToLong(buffer);
 
-        // parse transactions
-        List<BitcoinTransaction> allBlockTransactions = parseTransactions(rawByteBuffer, currentTransactionCounter);
-        if (allBlockTransactions.size() != currentTransactionCounter) {
-            throw new BitcoinBlockReadException("Error: Number of Transactions (" + allBlockTransactions.size() + ") does not correspond to transaction counter in block (" + currentTransactionCounter + ")");
+        List<BitcoinTransaction> transactions = parseTransactions(buffer, transactionCounter);
+        if (transactions.size() != transactionCounter) {
+            throw new BitcoinBlockReadException("Error: Number of Transactions (" + transactions.size() + ") does not correspond to transaction counter in block (" + transactionCounter + ")");
         }
 
-        BitcoinBlock result = new BitcoinBlock();
-        result.setMagicNo(currentMagicNo);
-        result.setBlockSize(currentBlockSize);
-        result.setVersion(currentVersion);
-        result.setTime(currentTime);
-        result.setBits(currentBits);
-        result.setNonce(currentNonce);
-        result.setHashPrevBlock(currentHashPrevBlock);
-        result.setHashMerkleRoot(currentHashMerkleRoot);
-        result.setAuxPOW(auxPOW);
-        result.setTransactions(allBlockTransactions);
-        return result;
+        return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
+                                        hashMerkleRoot, transactions, auxPOW);
     }
 
 
