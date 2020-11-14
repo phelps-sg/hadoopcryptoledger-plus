@@ -68,7 +68,7 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     @Override
     public byte[] getBytes() {
         return new Bytes(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8),
-                            txOutScriptLength, txOutScript).getBytes();
+                txOutScriptLength, txOutScript).getBytes();
     }
 
 }

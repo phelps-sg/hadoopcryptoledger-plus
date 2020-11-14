@@ -33,7 +33,7 @@ public class EpochDatetime extends UInt32 {
     }
 
     public Date getDate() {
-        return new Date(getValue()*1000);
+        return new Date(getValue() * 1000);
     }
 
 }

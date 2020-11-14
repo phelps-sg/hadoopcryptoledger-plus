@@ -17,21 +17,17 @@
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-
-import java.io.IOException;
-
-import java.nio.ByteBuffer;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BytesWritable;
-
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 
 public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BytesWritable> {
@@ -44,7 +40,6 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
 
 
     /**
-     *
      * Create an empty key
      *
      * @return key
@@ -55,7 +50,6 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
     }
 
     /**
-     *
      * Create an empty value
      *
      * @return value
@@ -67,12 +61,10 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
 
 
     /**
-     *
      * Read a next block.
      *
-     * @param key is a 64 byte array (hashMerkleRoot and prevHashBlock)
+     * @param key   is a 64 byte array (hashMerkleRoot and prevHashBlock)
      * @param value is a deserialized Java object of class BitcoinBlock
-     *
      * @return true if next block is available, false if not
      */
     @Override

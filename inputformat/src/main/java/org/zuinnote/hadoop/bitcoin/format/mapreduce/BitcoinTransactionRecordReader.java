@@ -17,81 +17,70 @@
 package org.zuinnote.hadoop.bitcoin.format.mapreduce;
 
 
-
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.BytesWritable;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinTransaction;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
 import java.io.IOException;
 
 
-import org.apache.hadoop.io.BytesWritable; 
-
-import org.apache.hadoop.conf.Configuration;
-
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import org.zuinnote.hadoop.bitcoin.format.common.*;
-
-
 public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BitcoinTransaction> {
-private static final Log LOG = LogFactory.getLog(BitcoinBlockRecordReader.class.getName());
+    private static final Log LOG = LogFactory.getLog(BitcoinBlockRecordReader.class.getName());
 
-private int currentTransactionCounterInBlock=0;
-private BitcoinBlock currentBitcoinBlock;
-private BytesWritable currentKey=new BytesWritable();
-private BitcoinTransaction currentValue=new BitcoinTransaction();
-
-
-
-public BitcoinTransactionRecordReader(Configuration conf) throws HadoopCryptoLedgerConfigurationException {
-	super(conf);
-}
-
-/**
-*
-*  get current key after calling next()
-*
-* @return key is is a 68 byte array (hashMerkleRoot, prevHashBlock, transActionCounter)
-*/
-@Override
-public BytesWritable getCurrentKey() {
-	return this.currentKey;
-}
-
-/**
-*
-*  get current value after calling next()
-*
-* @return value is a deserialized Java object of class BitcoinTransaction
-*/
-@Override
-public BitcoinTransaction getCurrentValue() {
-	return this.currentValue;
-}
+    private int currentTransactionCounterInBlock = 0;
+    private BitcoinBlock currentBitcoinBlock;
+    private BytesWritable currentKey = new BytesWritable();
+    private BitcoinTransaction currentValue = new BitcoinTransaction();
 
 
-/**
-*
-* Read a next block. 
-*
-*
-* @return true if next block is available, false if not
-*/
-@Override
-public boolean nextKeyValue() throws IOException {
-	// read all the blocks, if necessary a block overlapping a split
-	while(getFilePosition()<=getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
-		if ((currentBitcoinBlock==null) || (currentBitcoinBlock.getTransactions().size()==currentTransactionCounterInBlock)){
-			try {
-				currentBitcoinBlock=getBbr().readBlock();
-				currentTransactionCounterInBlock=0;
-			} catch (BitcoinBlockReadException e) {
-				// log
-				LOG.error(e);
-			}
-		}
+    public BitcoinTransactionRecordReader(Configuration conf) throws HadoopCryptoLedgerConfigurationException {
+        super(conf);
+    }
+
+    /**
+     * get current key after calling next()
+     *
+     * @return key is is a 68 byte array (hashMerkleRoot, prevHashBlock, transActionCounter)
+     */
+    @Override
+    public BytesWritable getCurrentKey() {
+        return this.currentKey;
+    }
+
+    /**
+     * get current value after calling next()
+     *
+     * @return value is a deserialized Java object of class BitcoinTransaction
+     */
+    @Override
+    public BitcoinTransaction getCurrentValue() {
+        return this.currentValue;
+    }
+
+
+    /**
+     * Read a next block.
+     *
+     * @return true if next block is available, false if not
+     */
+    @Override
+    public boolean nextKeyValue() throws IOException {
+        // read all the blocks, if necessary a block overlapping a split
+        while (getFilePosition() <= getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
+            if ((currentBitcoinBlock == null) || (currentBitcoinBlock.getTransactions().size() == currentTransactionCounterInBlock)) {
+                try {
+                    currentBitcoinBlock = getBbr().readBlock();
+                    currentTransactionCounterInBlock = 0;
+                } catch (BitcoinBlockReadException e) {
+                    // log
+                    LOG.error(e);
+                }
+            }
 
             if (currentBitcoinBlock == null) {
                 return false;
@@ -106,7 +95,6 @@ public boolean nextKeyValue() throws IOException {
         }
         return false;
     }
-
 
 
 }

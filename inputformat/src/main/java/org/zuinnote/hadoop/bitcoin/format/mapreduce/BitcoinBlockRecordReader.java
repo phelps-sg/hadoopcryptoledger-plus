@@ -16,22 +16,18 @@
 
 package org.zuinnote.hadoop.bitcoin.format.mapreduce;
 
-import java.io.IOException;
-
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.conf.Configuration;
-
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.BytesWritable;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
-import org.zuinnote.hadoop.bitcoin.format.common.*;
+import java.io.IOException;
 
 /**
  * Reads records as blocks of the bitcoin blockchain. Note that it can be tricky to find the start of a block in a split. The BitcoinBlockReader provides a method (seekBlockStart) for this.
- *
  */
 
 public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BitcoinBlock> {
@@ -44,8 +40,7 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
     }
 
     /**
-     *
-     *  get current key after calling next()
+     * get current key after calling next()
      *
      * @return key is a 64 byte array (hashMerkleRoot and prevHashBlock)
      */
@@ -55,8 +50,7 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
     }
 
     /**
-     *
-     *  get current value after calling next()
+     * get current value after calling next()
      *
      * @return is a deserialized Java object of class BitcoinBlock
      */
@@ -67,9 +61,7 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
 
 
     /**
-     *
      * Read a next block.
-     *
      *
      * @return true if next block is available, false if not
      */
@@ -88,8 +80,8 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
             if (dataBlock == null) {
                 return false;
             }
-            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot();
-            byte[] hashPrevBlock = dataBlock.getHashPrevBlock();
+            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot().getBytes();
+            byte[] hashPrevBlock = dataBlock.getHashPrevBlock().getBytes();
             byte[] newKey = new byte[hashMerkleRoot.length + hashPrevBlock.length];
             for (int i = 0; i < hashMerkleRoot.length; i++) {
                 newKey[i] = hashMerkleRoot[i];

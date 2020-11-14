@@ -23,7 +23,6 @@ import java.util.List;
 
 /**
  *
- *
  */
 public class BitcoinScriptWitnessItem implements Serializable, Byteable {
 

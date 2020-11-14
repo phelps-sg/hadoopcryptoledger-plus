@@ -16,16 +16,20 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import java.io.*;
-
 import org.apache.hadoop.io.Writable;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * <p>
@@ -34,31 +38,24 @@ import java.util.ArrayList;
  *
  * <p>
  * It contains modified code from
- *  <a href="https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java">Block.java</a>
- *  by Andreas Schildbach.
- *  </p>
+ * <a href="https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java">Block.java</a>
+ * by Andreas Schildbach.
+ * </p>
  **/
 public class BitcoinBlock implements Serializable, Writable {
 
-    public static final int HEADER_SIZE_BYTES = 6*32;
-
     private UInt32 blockSize;
-    private byte[] magicNo;
+    private Magic magicNo;
     private UInt32 version;
     private EpochDatetime time;
     private UInt32 bits;
     private UInt32 nonce;
-    private byte[] hashPrevBlock;
-    private byte[] hashMerkleRoot;
+    private HashSHA256 hashPrevBlock;
+    private HashSHA256 hashMerkleRoot;
     private List<BitcoinTransaction> transactions;
     private BitcoinAuxPOW auxPOW;
 
     public BitcoinBlock() {
-        this.magicNo = new byte[0];
-        this.hashPrevBlock = new byte[0];
-        this.hashMerkleRoot = new byte[0];
-        this.transactions = new ArrayList<>();
-        this.auxPOW = new BitcoinAuxPOW();
     }
 
     public UInt32 getBlockSize() {
@@ -69,11 +66,11 @@ public class BitcoinBlock implements Serializable, Writable {
         this.blockSize = blockSize;
     }
 
-    public byte[] getMagicNo() {
+    public Magic getMagicNo() {
         return this.magicNo;
     }
 
-    public void setMagicNo(byte[] magicNo) {
+    public void setMagicNo(Magic magicNo) {
         this.magicNo = magicNo;
     }
 
@@ -109,21 +106,23 @@ public class BitcoinBlock implements Serializable, Writable {
         this.nonce = nonce;
     }
 
-    public byte[] getHashPrevBlock() { return this.hashPrevBlock; }
-
-    public String getHashPrevBlockString() {
-        return BitcoinUtil.convertByteArrayToHexString(getHashPrevBlock());
+    public HashSHA256 getHashPrevBlock() {
+        return this.hashPrevBlock;
     }
 
-    public void setHashPrevBlock(byte[] hashPrevBlock) {
+    public String getHashPrevBlockString() {
+        return getHashPrevBlock().toString();
+    }
+
+    public void setHashPrevBlock(HashSHA256 hashPrevBlock) {
         this.hashPrevBlock = hashPrevBlock;
     }
 
-    public byte[] getHashMerkleRoot() {
+    public HashSHA256 getHashMerkleRoot() {
         return this.hashMerkleRoot;
     }
 
-    public void setHashMerkleRoot(byte[] hashMerkleRoot) {
+    public void setHashMerkleRoot(HashSHA256 hashMerkleRoot) {
         this.hashMerkleRoot = hashMerkleRoot;
     }
 
@@ -138,7 +137,6 @@ public class BitcoinBlock implements Serializable, Writable {
     public BitcoinAuxPOW getAuxPOW() {
         return this.auxPOW;
     }
-
 
     public void setAuxPOW(BitcoinAuxPOW auxPOW) {
         this.auxPOW = auxPOW;
@@ -170,7 +168,7 @@ public class BitcoinBlock implements Serializable, Writable {
     /**
      * Get the time field as a Unix epoch time.
      *
-     * @return  A positive 64-bit integer representing the number of seconds elapsed since the Epoch.
+     * @return A positive 64-bit integer representing the number of seconds elapsed since the Epoch.
      */
     public long getEpochTime() {
         return getTime().longValue();
@@ -179,7 +177,7 @@ public class BitcoinBlock implements Serializable, Writable {
     /**
      * Get the time field as a Java Date.
      *
-     * @return  The time-stamp for the block as a java.util.Date object.
+     * @return The time-stamp for the block as a java.util.Date object.
      */
     public Date getDate() {
         return getTime().getDate();
@@ -187,11 +185,12 @@ public class BitcoinBlock implements Serializable, Writable {
 
     /**
      * Build the Merkle Tree for this block.
-     *
+     * <p>
      * This code is a modified version of the method of the same name from
-     *  https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java
-     *  by Andreas Schildbach.
-     * @return  The Merkle Tree for this block.
+     * https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java
+     * by Andreas Schildbach.
+     *
+     * @return The Merkle Tree for this block.
      */
     public List<byte[]> buildMerkleTree() {
         // The Merkle root is based on a tree of hashes calculated from the transactions:
@@ -254,16 +253,16 @@ public class BitcoinBlock implements Serializable, Writable {
         return tree.get(tree.size() - 1);
     }
 
-    public byte[] getHash() {
-        return BitcoinUtil.reverseByteArray(getHeader().hashTwice());
+    public HashSHA256 getHash() {
+        return new HashSHA256(getHeader());
     }
 
     public String getHashString() {
-        return BitcoinUtil.convertByteArrayToHexString(getHash());
+        return getHash().toString();
     }
 
     public Bytes getHeader() {
         return new Bytes(version, hashPrevBlock, BitcoinUtil.reverseByteArray(calculateMerkleRoot()),
-                            time, bits, nonce);
+                time, bits, nonce);
     }
 }
