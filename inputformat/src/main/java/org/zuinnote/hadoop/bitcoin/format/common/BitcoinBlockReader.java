@@ -19,6 +19,8 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
 import java.io.BufferedInputStream;
@@ -127,19 +129,19 @@ public class BitcoinBlockReader {
         // magic no
         rawByteBuffer.get(currentMagicNo, 0, 4);
         // blocksize
-        LittleEndianUInt32 currentBlockSize = new LittleEndianUInt32(rawByteBuffer.getInt());
+        UInt32 currentBlockSize = new UInt32(rawByteBuffer.getInt());
         // version
-        LittleEndianUInt32 currentVersion = new LittleEndianUInt32(rawByteBuffer);
+        UInt32 currentVersion = new UInt32(rawByteBuffer);
         // hashPrevBlock
         rawByteBuffer.get(currentHashPrevBlock, 0, 32);
         // hashMerkleRoot
         rawByteBuffer.get(currentHashMerkleRoot, 0, 32);
         // time
-        LittleEndianUInt32 currentTime = new LittleEndianUInt32(rawByteBuffer);
+        EpochDatetime currentTime = new EpochDatetime(rawByteBuffer);
         // bits/difficulty
-        LittleEndianUInt32 currentBits = new LittleEndianUInt32(rawByteBuffer);
+        UInt32 currentBits = new UInt32(rawByteBuffer);
         // nonce
-        LittleEndianUInt32 currentNonce = new LittleEndianUInt32(rawByteBuffer);
+        UInt32 currentNonce = new UInt32(rawByteBuffer);
 
         // parse AuxPOW (if available)
         BitcoinAuxPOW auxPOW = parseAuxPow(rawByteBuffer);
