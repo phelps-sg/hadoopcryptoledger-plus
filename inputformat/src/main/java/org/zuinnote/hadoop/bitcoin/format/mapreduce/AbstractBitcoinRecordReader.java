@@ -120,7 +120,6 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
         if (isCompressedInput()) { // decompress
             decompressor = CodecPool.getDecompressor(codec);
             if (codec instanceof SplittableCompressionCodec) {
-
                 final SplitCompressionInputStream cIn = ((SplittableCompressionCodec) codec).createInputStream(fileIn, decompressor, start, end, SplittableCompressionCodec.READ_MODE.CONTINUOUS);
                 bbr = new BitcoinBlockReader(cIn, this.maxSizeBitcoinBlock, this.bufferSize, this.specificMagicByteArray, this.useDirectBuffer, this.readAuxPOW);
                 start = cIn.getAdjustedStart();
@@ -136,12 +135,12 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
             filePosition = fileIn;
         }
         // seek to block start (for the case a block overlaps a split)
-        try {
+//        try {
             bbr.seekBlockStart();
-        } catch (BitcoinBlockReadException bbre) {
-            LOG.error("Error reading Bitcoin blockchhain data");
-            LOG.error(bbre);
-        }
+//        } catch (BitcoinBlockReadException bbre) {
+//            LOG.error("Error reading Bitcoin blockchhain data");
+//            LOG.error(bbre);
+//        }
     }
 
 
