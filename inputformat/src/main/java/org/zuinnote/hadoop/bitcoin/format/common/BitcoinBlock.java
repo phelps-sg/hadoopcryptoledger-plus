@@ -55,6 +55,21 @@ public class BitcoinBlock implements Serializable, Writable {
     private List<BitcoinTransaction> transactions;
     private BitcoinAuxPOW auxPOW;
 
+    public BitcoinBlock(UInt32 blockSize, Magic magicNo, UInt32 version, EpochDatetime time, UInt32 bits,
+                            UInt32 nonce, HashSHA256 hashPrevBlock, HashSHA256 hashMerkleRoot,
+                            List<BitcoinTransaction> transactions, BitcoinAuxPOW auxPOW) {
+        this.blockSize = blockSize;
+        this.magicNo = magicNo;
+        this.version = version;
+        this.time = time;
+        this.bits = bits;
+        this.nonce = nonce;
+        this.hashPrevBlock = hashPrevBlock;
+        this.hashMerkleRoot = hashMerkleRoot;
+        this.transactions = transactions;
+        this.auxPOW = auxPOW;
+    }
+
     public BitcoinBlock() {
     }
 
@@ -263,6 +278,6 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public Bytes getHeader() {
         return new Bytes(version, hashPrevBlock, BitcoinUtil.reverseByteArray(calculateMerkleRoot()),
-                time, bits, nonce);
+                            time, bits, nonce);
     }
 }

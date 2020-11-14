@@ -34,6 +34,9 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     private byte[] txOutScriptLength;
     private byte[] txOutScript;
 
+    //TODO Configure from magic?
+    protected static NetworkParameters networkParameters = MainNetParams.get();
+
     public BitcoinTransactionOutput(BigInteger value, byte[] txOutScriptLength, byte[] txOutScript) {
         this.value = value;
         this.txOutScriptLength = txOutScriptLength;
@@ -58,7 +61,7 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     }
 
     public Address getToAddress() {
-        return getToAddress(MainNetParams.get());
+        return getToAddress(networkParameters);
     }
 
     public String getToAddressString() {

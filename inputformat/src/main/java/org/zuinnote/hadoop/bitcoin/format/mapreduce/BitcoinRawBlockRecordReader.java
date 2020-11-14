@@ -68,12 +68,12 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
         // read all the blocks, if necessary a block overlapping a split
         while (getFilePosition() <= getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
             ByteBuffer dataBlock = null;
-            try {
+//            try {
                 dataBlock = getBbr().readRawBlock();
-            } catch (BitcoinBlockReadException e) {
+//            } catch (BitcoinBlockReadException e) {
                 // log
-                LOG.error(e);
-            }
+//                LOG.error(e);
+//            }
             if (dataBlock == null) {
                 return false;
             }

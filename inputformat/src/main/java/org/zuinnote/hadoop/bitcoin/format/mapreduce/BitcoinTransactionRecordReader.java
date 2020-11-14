@@ -73,13 +73,13 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
         // read all the blocks, if necessary a block overlapping a split
         while (getFilePosition() <= getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
             if ((currentBitcoinBlock == null) || (currentBitcoinBlock.getTransactions().size() == currentTransactionCounterInBlock)) {
-                try {
+//                try {
                     currentBitcoinBlock = getBbr().readBlock();
                     currentTransactionCounterInBlock = 0;
-                } catch (BitcoinBlockReadException e) {
-                    // log
-                    LOG.error(e);
-                }
+//                } catch (BitcoinBlockReadException e) {
+//                     log
+//                    LOG.error(e);
+//                }
             }
 
             if (currentBitcoinBlock == null) {

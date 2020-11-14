@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
@@ -70,13 +71,13 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
         // read all the blocks, if necessary a block overlapping a split
         while (getFilePosition() <= getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
             BitcoinBlock dataBlock = null;
-            try {
+//            try {
                 dataBlock = getBbr().readBlock();
 
-            } catch (BitcoinBlockReadException e) {
+//            } catch (BitcoinBlockReadException e) {
                 // log
-                LOG.error(e);
-            }
+//                LOG.error(e);
+//            }
             if (dataBlock == null) {
                 return false;
             }
