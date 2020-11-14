@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 /**
- * A date time stamp stored as an unsigned 32-bit integer epoch time.
+ * A date time stamp stored as a little-endian unsigned 32-bit integer epoch time.
  */
 public class EpochDatetime extends UInt32 {
 
