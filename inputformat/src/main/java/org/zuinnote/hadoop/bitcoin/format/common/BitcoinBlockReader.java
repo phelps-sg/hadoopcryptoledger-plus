@@ -128,7 +128,7 @@ public class BitcoinBlockReader {
         // magic no
         rawByteBuffer.get(currentMagicNo, 0, 4);
         // blocksize
-        UInt32 currentBlockSize = new UInt32(rawByteBuffer.getInt());
+        UInt32 currentBlockSize = new UInt32(rawByteBuffer);
         // version
         UInt32 currentVersion = new UInt32(rawByteBuffer);
         // hashPrevBlock
@@ -159,7 +159,6 @@ public class BitcoinBlockReader {
         result.setTime(currentTime);
         result.setBits(currentBits);
         result.setNonce(currentNonce);
-//        result.setTransactionCounter(currentTransactionCounter);
         result.setHashPrevBlock(currentHashPrevBlock);
         result.setHashMerkleRoot(currentHashMerkleRoot);
         result.setAuxPOW(auxPOW);
