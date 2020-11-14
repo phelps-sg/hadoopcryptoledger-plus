@@ -43,8 +43,8 @@ public class HashSHA256 implements Byteable {
     }
 
     public void setValue(ByteBuffer buffer) {
-        for(int i=0; i<NUM_BYTES; i++) {
-            rawData[i] =  buffer.get();
+        for (int i = 0; i < NUM_BYTES; i++) {
+            rawData[i] = buffer.get();
         }
     }
 

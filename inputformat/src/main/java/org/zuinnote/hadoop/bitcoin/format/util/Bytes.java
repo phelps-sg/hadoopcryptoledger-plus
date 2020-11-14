@@ -81,14 +81,14 @@ public class Bytes implements Byteable {
     }
 
     public void write(List items) {
-        for(Object item : items) {
-           assert(item instanceof Byteable);
-           write(((Byteable) item).getBytes());
+        for (Object item : items) {
+            assert (item instanceof Byteable);
+            write(((Byteable) item).getBytes());
         }
     }
 
     public void write(Object... items) {
-        for(Object item : items) {
+        for (Object item : items) {
             if (item instanceof Byteable) {
                 write(((Byteable) item).getBytes());
             } else if (item instanceof byte[]) {

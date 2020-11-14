@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 
 /**
  * An implementation of an unsigned 32-bit integer in Java.
- *
+ * <p>
  * The value is stored in a raw little-endian four-byte buffer, and then converted
  * to a 64-bit signed long on-demand.  This allows UINT32 values  to be stored efficiently
  * for big-data computations while retaining the full range of positive values.
@@ -31,7 +31,7 @@ import java.nio.ByteOrder;
 public class UInt32 extends Number implements Byteable {
 
     public static final int NUM_BYTES = 4;
-    public static final long MAX = (1L<<(NUM_BYTES*8)) - 1;
+    public static final long MAX = (1L << (NUM_BYTES * 8)) - 1;
 
     /**
      * The raw data stored as 4 bytes in little-endian order.
@@ -79,8 +79,8 @@ public class UInt32 extends Number implements Byteable {
     }
 
     public void setValue(ByteBuffer buffer) {
-        for(int i=0; i<NUM_BYTES; i++) {
-           rawData.put(i, buffer.get());
+        for (int i = 0; i < NUM_BYTES; i++) {
+            rawData.put(i, buffer.get());
         }
     }
 

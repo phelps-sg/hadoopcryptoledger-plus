@@ -23,7 +23,9 @@ import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class BitcoinTransaction implements Serializable, Writable {
     private List<BitcoinScriptWitnessItem> scriptWitnessItems;
     private EpochDatetime lockTime;
 
-	private static transient final Log LOG = LogFactory.getLog(BitcoinTransaction.class.getName());
+    private static transient final Log LOG = LogFactory.getLog(BitcoinTransaction.class.getName());
 
     public BitcoinTransaction() {
         this.version = new UInt32(0);
@@ -158,62 +160,62 @@ public class BitcoinTransaction implements Serializable, Writable {
         throw new UnsupportedOperationException("readFields unsupported");
     }
 
-	/**
-	 * Calculates the double SHA256-Hash of a transaction in little endian format.
-	 * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/).
-	 * Note that this can be compared to a prevTransactionHash. However, if you want to search for it in
-	 * popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
+    /**
+     * Calculates the double SHA256-Hash of a transaction in little endian format.
+     * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/).
+     * Note that this can be compared to a prevTransactionHash. However, if you want to search for it in
+     * popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
      *
-	 * @return byte array containing the hash of the transaction.
-	 */
+     * @return byte array containing the hash of the transaction.
+     */
     public byte[] getTransactionHash() {
         return new Bytes(version, inCounter, inputs, outCounter, outputs, lockTime).hashTwice();
     }
 
-	/**
-	 * <p>
-	 * Calculates the double SHA256-Hash of a transaction in little endian format.
-	 * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/).
-	 * Note that this can be compared to a prevTransactionHash.
-	 * However, if you want to search for it in popular blockchain explorers then you need to
-	 * apply the function BitcoinUtil.reverseByteArray to it.
+    /**
+     * <p>
+     * Calculates the double SHA256-Hash of a transaction in little endian format.
+     * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/).
+     * Note that this can be compared to a prevTransactionHash.
+     * However, if you want to search for it in popular blockchain explorers then you need to
+     * apply the function BitcoinUtil.reverseByteArray to it.
      * </p>
-	 *
-	 * @return byte array containing the hash of the transaction.
-	 */
-	public byte[] getTransactionHashSegwit() {
-			Bytes buffer = new Bytes();
-			buffer.write(version);
-			// check if segwit
-			boolean segwit = false;
-			if ((getMarker() == 0) && (getFlag() != 0)) {
-				segwit = true;
-				// we still need to check the case that all witness script stack items for all input transactions are
-				// of size 0 => traditional transaction hash calculation
-				// cf. https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
-				// A non-witness program (defined hereinafter) txin MUST be associated with an empty witness field,
-				// represented by a 0x00. If all txins are not witness program, a transaction's
-				// wtxid is equal to its txid.
-				boolean emptyWitness = true;
-				for (BitcoinScriptWitnessItem currentItem: scriptWitnessItems) {
-					if (currentItem.getStackItemCounter().length > 1
+     *
+     * @return byte array containing the hash of the transaction.
+     */
+    public byte[] getTransactionHashSegwit() {
+        Bytes buffer = new Bytes();
+        buffer.write(version);
+        // check if segwit
+        boolean segwit = false;
+        if ((getMarker() == 0) && (getFlag() != 0)) {
+            segwit = true;
+            // we still need to check the case that all witness script stack items for all input transactions are
+            // of size 0 => traditional transaction hash calculation
+            // cf. https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
+            // A non-witness program (defined hereinafter) txin MUST be associated with an empty witness field,
+            // represented by a 0x00. If all txins are not witness program, a transaction's
+            // wtxid is equal to its txid.
+            boolean emptyWitness = true;
+            for (BitcoinScriptWitnessItem currentItem : scriptWitnessItems) {
+                if (currentItem.getStackItemCounter().length > 1
                         || ((currentItem.getStackItemCounter().length == 1)
-                                && (currentItem.getStackItemCounter()[0] != 0x00))) {
-						emptyWitness = false;
-						break;
-					}
-				}
-				if (emptyWitness) {
-					return getTransactionHash();
-				}
-				buffer.write(marker, flag);
-			}
-			buffer.write(inCounter, inputs, outCounter, outputs);
-			if (segwit) {
-			    buffer.write(scriptWitnessItems);
+                        && (currentItem.getStackItemCounter()[0] != 0x00))) {
+                    emptyWitness = false;
+                    break;
+                }
             }
-			buffer.write(lockTime);
-			return buffer.hashTwice();
-	}
+            if (emptyWitness) {
+                return getTransactionHash();
+            }
+            buffer.write(marker, flag);
+        }
+        buffer.write(inCounter, inputs, outCounter, outputs);
+        if (segwit) {
+            buffer.write(scriptWitnessItems);
+        }
+        buffer.write(lockTime);
+        return buffer.hashTwice();
+    }
 
 }

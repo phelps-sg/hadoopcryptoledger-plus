@@ -29,7 +29,6 @@ public class BitcoinScriptPatternParser {
      * Get the payment destination from an scriptPubKey (output script of a transaction). This is based on standard scripts accepted by the Bitcoin network (https://en.bitcoin.it/wiki/Script).
      *
      * @param scriptPubKey output script of a transaction
-     *
      * @return a string in the following format in case of (1) a transfer for pay-to-witness-public-key-hash: P2WPKH_address (2)  for pay-to-witness-public-key-hash pay-to-witness-public-key-hash (P2WPKH) nested in BIP16 P2SH: P2WPKHP2SH_address (3) a transaction for 1-of-2 multi-signature version 0 pay-to-witness-script-hash (P2WSH): P2WSH_address (4) a standard transfer to a Bitcoin address : "bitcoinaddress_ADRESS" where ADDRESS is the Bitcoin address, (5) an (obsolete) transfer to a public key: "bitcoinpupkey_PUBKEY" where PUBKEY is the public key, (6) in case of output that cannot be spent: "unspendable", (7) in case anyone can spend: "anyone", (8) in case of transaction puzzle: "puzzle_HASH256" where HASH256 is the puzzle (9) in all other cases null (different type of Bitcoin transaction)
      **/
 
@@ -83,7 +82,6 @@ public class BitcoinScriptPatternParser {
      * Checks if scriptPubKey is about a transaction for pay-to-witness-public-key-hash (P2WPKH)
      * Note that we return only the keyhash, but more information can be found in the witness (cf. https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki)
      *
-     *
      * @param scriptPubKey
      * @return null, if transaction is not about P2WPKH, a string starting with "P2WPKH_keyhash"
      */
@@ -124,7 +122,6 @@ public class BitcoinScriptPatternParser {
     /**
      * Checks if scriptPubKey is about a transaction for 1-of-2 multi-signature version 0 pay-to-witness-script-hash (P2WSH)
      * Note that we return only the keyhash, but more information can be found in the witness (cf. https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki)
-     *
      *
      * @param scriptPubKey
      * @return null, if transaction is not about P2WSH, a string starting with "P2WSH_keyhash"

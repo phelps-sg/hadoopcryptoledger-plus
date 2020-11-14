@@ -15,24 +15,15 @@
  */
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.mapred.*;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinTransaction;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
 import java.io.IOException;
-
-
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-
-import org.zuinnote.hadoop.bitcoin.format.common.*;
 
 public class BitcoinTransactionFileInputFormat extends AbstractBitcoinFileInputFormat<BytesWritable, BitcoinTransaction> {
 

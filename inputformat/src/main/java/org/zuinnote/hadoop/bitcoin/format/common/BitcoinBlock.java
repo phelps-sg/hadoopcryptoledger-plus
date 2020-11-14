@@ -16,8 +16,6 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
-import java.io.*;
-
 import org.apache.hadoop.io.Writable;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
@@ -25,9 +23,13 @@ import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * <p>
@@ -36,9 +38,9 @@ import java.util.ArrayList;
  *
  * <p>
  * It contains modified code from
- *  <a href="https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java">Block.java</a>
- *  by Andreas Schildbach.
- *  </p>
+ * <a href="https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java">Block.java</a>
+ * by Andreas Schildbach.
+ * </p>
  **/
 public class BitcoinBlock implements Serializable, Writable {
 
@@ -104,7 +106,9 @@ public class BitcoinBlock implements Serializable, Writable {
         this.nonce = nonce;
     }
 
-    public HashSHA256 getHashPrevBlock() { return this.hashPrevBlock; }
+    public HashSHA256 getHashPrevBlock() {
+        return this.hashPrevBlock;
+    }
 
     public String getHashPrevBlockString() {
         return getHashPrevBlock().toString();
@@ -164,7 +168,7 @@ public class BitcoinBlock implements Serializable, Writable {
     /**
      * Get the time field as a Unix epoch time.
      *
-     * @return  A positive 64-bit integer representing the number of seconds elapsed since the Epoch.
+     * @return A positive 64-bit integer representing the number of seconds elapsed since the Epoch.
      */
     public long getEpochTime() {
         return getTime().longValue();
@@ -173,7 +177,7 @@ public class BitcoinBlock implements Serializable, Writable {
     /**
      * Get the time field as a Java Date.
      *
-     * @return  The time-stamp for the block as a java.util.Date object.
+     * @return The time-stamp for the block as a java.util.Date object.
      */
     public Date getDate() {
         return getTime().getDate();
@@ -181,11 +185,12 @@ public class BitcoinBlock implements Serializable, Writable {
 
     /**
      * Build the Merkle Tree for this block.
-     *
+     * <p>
      * This code is a modified version of the method of the same name from
-     *  https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java
-     *  by Andreas Schildbach.
-     * @return  The Merkle Tree for this block.
+     * https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/Block.java
+     * by Andreas Schildbach.
+     *
+     * @return The Merkle Tree for this block.
      */
     public List<byte[]> buildMerkleTree() {
         // The Merkle root is based on a tree of hashes calculated from the transactions:
@@ -258,6 +263,6 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public Bytes getHeader() {
         return new Bytes(version, hashPrevBlock, BitcoinUtil.reverseByteArray(calculateMerkleRoot()),
-                            time, bits, nonce);
+                time, bits, nonce);
     }
 }

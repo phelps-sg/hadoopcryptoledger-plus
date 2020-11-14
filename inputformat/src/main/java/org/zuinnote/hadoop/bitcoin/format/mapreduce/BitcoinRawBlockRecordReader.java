@@ -16,20 +16,15 @@
 
 package org.zuinnote.hadoop.bitcoin.format.mapreduce;
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.BytesWritable;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
-
-import org.apache.hadoop.io.BytesWritable;
-
-import org.apache.hadoop.conf.Configuration;
-
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BytesWritable> {
 
@@ -42,8 +37,7 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
     }
 
     /**
-     *
-     *  get current key after calling next()
+     * get current key after calling next()
      *
      * @return key is a 64 byte array (hashMerkleRoot and prevHashBlock)
      */
@@ -54,8 +48,7 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
 
 
     /**
-     *
-     *  get current value after calling next()
+     * get current value after calling next()
      *
      * @return value is a deserialized Java object of class BitcoinBlock
      */
@@ -66,7 +59,6 @@ public class BitcoinRawBlockRecordReader extends AbstractBitcoinRecordReader<Byt
 
 
     /**
-     *
      * Read a next block.
      *
      * @return true if next block is available, false if not

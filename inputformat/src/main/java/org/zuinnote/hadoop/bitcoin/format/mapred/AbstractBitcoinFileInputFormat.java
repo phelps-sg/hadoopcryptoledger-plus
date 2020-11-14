@@ -45,9 +45,7 @@ public abstract class AbstractBitcoinFileInputFormat<K, V> extends FileInputForm
     }
 
     /**
-     *
      * This method is experimental and derived from TextInputFormat. It is not necessary and not recommended to compress the blockchain files. Instead it is recommended to extract relevant data from the blockchain files once and store them in a format suitable for analytics (including compression), such as ORC or Parquet.
-     *
      */
     @Override
     protected boolean isSplitable(FileSystem fs, Path file) {

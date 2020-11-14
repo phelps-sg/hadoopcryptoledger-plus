@@ -63,7 +63,7 @@ public class BitcoinTransactionInput implements Serializable, Byteable {
     @Override
     public byte[] getBytes() {
         return new Bytes(prevTransactionHash, previousTxOutIndex, txInScriptLength,
-                            txInScript, seqNo)
+                txInScript, seqNo)
                 .getBytes();
     }
 

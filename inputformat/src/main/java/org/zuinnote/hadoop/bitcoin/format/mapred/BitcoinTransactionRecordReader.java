@@ -17,22 +17,18 @@
 package org.zuinnote.hadoop.bitcoin.format.mapred;
 
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-
-import java.io.IOException;
-
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BytesWritable;
-
-
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Reporter;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinTransaction;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.zuinnote.hadoop.bitcoin.format.common.*;
+import java.io.IOException;
 
 public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<BytesWritable, BitcoinTransaction> {
 
@@ -47,7 +43,6 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
     }
 
     /**
-     *
      * Create an empty key
      *
      * @return key
@@ -58,7 +53,6 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
     }
 
     /**
-     *
      * Create an empty value
      *
      * @return value
@@ -70,12 +64,10 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
 
 
     /**
-     *
      * Read a next block.
      *
-     * @param key is a 68 byte array (hashMerkleRoot, prevHashBlock, transActionCounter)
+     * @param key   is a 68 byte array (hashMerkleRoot, prevHashBlock, transActionCounter)
      * @param value is a deserialized Java object of class BitcoinBlock
-     *
      * @return true if next block is available, false if not
      */
     @Override
@@ -92,18 +84,18 @@ public class BitcoinTransactionRecordReader extends AbstractBitcoinRecordReader<
                 }
             }
 
-		if (currentBitcoinBlock==null) {
-			return false;
-		}
-		BitcoinTransaction currentTransaction=currentBitcoinBlock.getTransactions().get(currentTransactionCounterInBlock);
-		// the unique identifier that is linked in other transaction is usually its hash
-		byte[] newKey = currentTransaction.getTransactionHash();
-		key.set(newKey, 0, newKey.length);
-		value.set(currentTransaction);
-		currentTransactionCounterInBlock++;
-		return true;
-	}
-	return false;
-}
+            if (currentBitcoinBlock == null) {
+                return false;
+            }
+            BitcoinTransaction currentTransaction = currentBitcoinBlock.getTransactions().get(currentTransactionCounterInBlock);
+            // the unique identifier that is linked in other transaction is usually its hash
+            byte[] newKey = currentTransaction.getTransactionHash();
+            key.set(newKey, 0, newKey.length);
+            value.set(currentTransaction);
+            currentTransactionCounterInBlock++;
+            return true;
+        }
+        return false;
+    }
 
 }

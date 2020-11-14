@@ -17,31 +17,24 @@
 package org.zuinnote.hadoop.bitcoin.format.mapreduce;
 
 
-import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
-import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-
-import java.io.IOException;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.Seekable;
-import org.apache.hadoop.io.compress.CodecPool;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.SplitCompressionInputStream;
-import org.apache.hadoop.io.compress.SplittableCompressionCodec;
-import org.apache.hadoop.io.compress.Decompressor;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.io.compress.*;
 import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlockReader;
+import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
+import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
+import org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import org.zuinnote.hadoop.bitcoin.format.common.*;
+import java.io.IOException;
 
 public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, V> {
     public static final String CONF_BUFFERSIZE = "io.file.buffer.size";
@@ -75,11 +68,10 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
 
     /**
      * Creates an Abstract Record Reader for Bitcoin blocks
+     *
      * @param conf Configuration:
-     * io.file.buffer.size: Size of in-memory  specified in the given Configuration. If io.file.buffer.size is not specified the default buffersize (maximum size of a bitcoin block) will be used. The configuration hadoopcryptoledger.bitcoinblockinputformat.filter.magic allows specifying the magic identifier of the block. The magic is a comma-separated list of Hex-values (e.g. F9BEB4D9,FABFB5DA,0B110907,0B110907). The default magic is always F9BEB4D9. One needs to specify at least one magic, otherwise it will be difficult to find blocks in splits. Furthermore, one may specify hadoopcryptoledger.bitcoinblockinputformat.maxblocksize, which defines the maximum size a bitcoin block may have. By default it is 8M). If you want to experiment with performance using DirectByteBuffer instead of HeapByteBuffer you can use "hadoopcryptoledeger.bitcoinblockinputformat.usedirectbuffer" (default: false). Note that it might have some unwanted consequences such as circumwenting Yarn memory management. The option is experimental and might be removed in future versions.
-     *
+     *             io.file.buffer.size: Size of in-memory  specified in the given Configuration. If io.file.buffer.size is not specified the default buffersize (maximum size of a bitcoin block) will be used. The configuration hadoopcryptoledger.bitcoinblockinputformat.filter.magic allows specifying the magic identifier of the block. The magic is a comma-separated list of Hex-values (e.g. F9BEB4D9,FABFB5DA,0B110907,0B110907). The default magic is always F9BEB4D9. One needs to specify at least one magic, otherwise it will be difficult to find blocks in splits. Furthermore, one may specify hadoopcryptoledger.bitcoinblockinputformat.maxblocksize, which defines the maximum size a bitcoin block may have. By default it is 8M). If you want to experiment with performance using DirectByteBuffer instead of HeapByteBuffer you can use "hadoopcryptoledeger.bitcoinblockinputformat.usedirectbuffer" (default: false). Note that it might have some unwanted consequences such as circumwenting Yarn memory management. The option is experimental and might be removed in future versions.
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.HadoopCryptoLedgerConfigurationException in case of an invalid HadoopCryptoLedger-specific configuration of the inputformat
-     *
      */
     public AbstractBitcoinRecordReader(Configuration conf) throws HadoopCryptoLedgerConfigurationException {
         // parse configuration
@@ -108,13 +100,11 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
 
     /**
      * Initializes reader
-     * @param split Split to use (assumed to be a file split)
+     *
+     * @param split   Split to use (assumed to be a file split)
      * @param context context of the job
-     *
-     *
-     * @throws java.io.IOException in case of errors reading from the filestream provided by Hadoop
+     * @throws java.io.IOException            in case of errors reading from the filestream provided by Hadoop
      * @throws java.lang.InterruptedException in case of thread interruption
-     *
      */
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
@@ -159,7 +149,6 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
      * Get the current Block Reader
      *
      * @return end of file position
-     *
      */
     public BitcoinBlockReader getBbr() {
         return this.bbr;
@@ -187,7 +176,6 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
      * Get the end of file
      *
      * @return end of file position
-     *
      */
 
     public long getEnd() {
@@ -198,8 +186,6 @@ public abstract class AbstractBitcoinRecordReader<K, V> extends RecordReader<K, 
      * Returns current position in file
      *
      * @return current position in file
-     *
-     *
      */
 
     public long getFilePosition() throws IOException {

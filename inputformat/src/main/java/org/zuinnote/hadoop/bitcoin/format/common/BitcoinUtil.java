@@ -25,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -64,9 +63,7 @@ public class BitcoinUtil {
      * Converts a long to a byte array
      *
      * @param longToConvert long that should be converted into a byte array
-     *
      * @return byte array corresponding to long
-     *
      **/
     public static byte[] convertLongToByteArray(long longToConvert) {
         return ByteBuffer.allocate(8).putLong(longToConvert).array();
@@ -76,7 +73,7 @@ public class BitcoinUtil {
      * Converts a Big Integer to a byte array
      *
      * @param bigIntegerToConvert BigInteger that should be converted into a byte array
-     * @param exactArraySize exact size of array
+     * @param exactArraySize      exact size of array
      * @return byte array corresponding to BigInteger
      **/
     public static byte[] convertBigIntegerToByteArray(BigInteger bigIntegerToConvert, int exactArraySize) {
@@ -295,9 +292,7 @@ public class BitcoinUtil {
      * It corresponds to the Bitcoin specification of txid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
-     *
      * @return byte array containing the hash of the transaction. Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-     *
      * @deprecated Use {@link BitcoinTransaction#getTransactionHash()}
      */
     public static byte[] getTransactionHash(BitcoinTransaction transaction) {
@@ -310,10 +305,8 @@ public class BitcoinUtil {
      * It corresponds to the Bitcoin specification of wtxid (https://bitcoincore.org/en/segwit_wallet_dev/)
      *
      * @param transaction The BitcoinTransaction of which we want to calculate the hash
-     *
      * @return byte array containing the hash of the transaction.
-     *          Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
-     *
+     * Note: This one can be compared to a prevTransactionHash. However, if you want to search for it in popular blockchain explorers then you need to apply the function BitcoinUtil.reverseByteArray to it!
      * @deprecated Use {@link BitcoinTransaction#getTransactionHashSegwit()}
      */
     public static byte[] getTransactionHashSegwit(BitcoinTransaction transaction) {
@@ -351,7 +344,7 @@ public class BitcoinUtil {
 
     /**
      * Returns a new SHA-256 MessageDigest instance.
-     *
+     * <p>
      * This is a convenience method which wraps the checked
      * exception that can never occur with a RuntimeException.
      *

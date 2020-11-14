@@ -21,10 +21,10 @@ import java.nio.ByteBuffer;
 public class Magic extends UInt32 {
 
     public static final Magic DEFAULT =
-            new Magic(new byte[] {(byte) 0xF9, (byte) 0xBE, (byte) 0xB4, (byte) 0xD9});
+            new Magic(new byte[]{(byte) 0xF9, (byte) 0xBE, (byte) 0xB4, (byte) 0xD9});
 
     public static final Magic TESTNET3 =
-            new Magic(new byte[] {(byte) 0x0B, (byte) 0x11, (byte) 0x09, (byte) 0x07});
+            new Magic(new byte[]{(byte) 0x0B, (byte) 0x11, (byte) 0x09, (byte) 0x07});
 
 //    public static final Magic MULTINET =
 //            new Magic(new byte[] {(byte) 0xF9, (byte) 0xBE, (byte) 0xB4, (byte) 0xD9}, {(byte) 0x0B, (byte) 0x11, (byte) 0x09, (byte) 0x07});
