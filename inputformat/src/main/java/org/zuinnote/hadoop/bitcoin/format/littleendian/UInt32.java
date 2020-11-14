@@ -1,4 +1,4 @@
-package org.zuinnote.hadoop.bitcoin.format.common;
+package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 
@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
  * to a 64-bit signed long on-demand.  This allows UINT32 values  to be stored efficiently
  * for big-data computations while retaining the full range of positive values.
  */
-public class LittleEndianUInt32 extends Number implements Byteable {
+public class UInt32 extends Number implements Byteable {
 
     public static final int NUM_BYTES = 4;
     public static final long MAX = (1L<<(NUM_BYTES*8)) - 1;
@@ -22,22 +22,22 @@ public class LittleEndianUInt32 extends Number implements Byteable {
      */
     protected ByteBuffer rawData;
 
-    public LittleEndianUInt32() {
+    public UInt32() {
         this.rawData = ByteBuffer.allocate(NUM_BYTES);
         this.rawData.order(ByteOrder.LITTLE_ENDIAN);
     }
 
-    public LittleEndianUInt32(byte[] value) {
+    public UInt32(byte[] value) {
         this();
         setValue(value);
     }
 
-    public LittleEndianUInt32(long value) {
+    public UInt32(long value) {
         this();
         setValue(value);
     }
 
-    public LittleEndianUInt32(ByteBuffer value) {
+    public UInt32(ByteBuffer value) {
         this();
         setValue(value);
     }

@@ -19,6 +19,8 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import java.io.*;
 
 import org.apache.hadoop.io.Writable;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.util.Date;
@@ -40,12 +42,12 @@ public class BitcoinBlock implements Serializable, Writable {
 
     public static final int HEADER_SIZE_BYTES = 6*32;
 
-    private LittleEndianUInt32 blockSize;
+    private UInt32 blockSize;
     private byte[] magicNo;
-    private LittleEndianUInt32 version;
-    private LittleEndianUInt32 time;
-    private LittleEndianUInt32 bits;
-    private LittleEndianUInt32 nonce;
+    private UInt32 version;
+    private EpochDatetime time;
+    private UInt32 bits;
+    private UInt32 nonce;
     private byte[] hashPrevBlock;
     private byte[] hashMerkleRoot;
     private List<BitcoinTransaction> transactions;
@@ -59,15 +61,13 @@ public class BitcoinBlock implements Serializable, Writable {
         this.auxPOW = new BitcoinAuxPOW();
     }
 
-
-    public LittleEndianUInt32 getBlockSize() {
+    public UInt32 getBlockSize() {
         return this.blockSize;
     }
 
-    public void setBlockSize(LittleEndianUInt32 blockSize) {
+    public void setBlockSize(UInt32 blockSize) {
         this.blockSize = blockSize;
     }
-
 
     public byte[] getMagicNo() {
         return this.magicNo;
@@ -77,35 +77,35 @@ public class BitcoinBlock implements Serializable, Writable {
         this.magicNo = magicNo;
     }
 
-    public LittleEndianUInt32 getVersion() {
+    public UInt32 getVersion() {
         return this.version;
     }
 
-    public void setVersion(LittleEndianUInt32 version) {
+    public void setVersion(UInt32 version) {
         this.version = version;
     }
 
-    public LittleEndianUInt32 getTime() {
+    public EpochDatetime getTime() {
         return this.time;
     }
 
-    public void setTime(LittleEndianUInt32 time) {
+    public void setTime(EpochDatetime time) {
         this.time = time;
     }
 
-    public LittleEndianUInt32 getBits() {
+    public UInt32 getBits() {
         return this.bits;
     }
 
-    public void setBits(LittleEndianUInt32 bits) {
+    public void setBits(UInt32 bits) {
         this.bits = bits;
     }
 
-    public LittleEndianUInt32 getNonce() {
+    public UInt32 getNonce() {
         return this.nonce;
     }
 
-    public void setNonce(LittleEndianUInt32 nonce) {
+    public void setNonce(UInt32 nonce) {
         this.nonce = nonce;
     }
 
@@ -182,7 +182,7 @@ public class BitcoinBlock implements Serializable, Writable {
      * @return  The time-stamp for the block as a java.util.Date object.
      */
     public Date getDate() {
-        return new Date(getEpochTime() * 1000L);
+        return getTime().getDate();
     }
 
     /**

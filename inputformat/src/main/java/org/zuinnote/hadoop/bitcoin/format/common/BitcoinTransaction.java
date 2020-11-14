@@ -19,16 +19,17 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Writable;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class BitcoinTransaction implements Serializable, Writable {
 
-    private LittleEndianUInt32 version;
+    private UInt32 version;
     private byte marker;
     private byte flag;
     private byte[] inCounter;
@@ -36,12 +37,12 @@ public class BitcoinTransaction implements Serializable, Writable {
     private List<BitcoinTransactionInput> inputs;
     private List<BitcoinTransactionOutput> outputs;
     private List<BitcoinScriptWitnessItem> scriptWitnessItems;
-    private LittleEndianUInt32 lockTime;
+    private EpochDatetime lockTime;
 
 	private static transient final Log LOG = LogFactory.getLog(BitcoinTransaction.class.getName());
 
     public BitcoinTransaction() {
-        this.version = new LittleEndianUInt32(0);
+        this.version = new UInt32(0);
         this.marker = 1;
         this.flag = 0;
         this.inCounter = new byte[0];
@@ -49,7 +50,7 @@ public class BitcoinTransaction implements Serializable, Writable {
         this.inputs = new ArrayList<>();
         this.outputs = new ArrayList<>();
         this.scriptWitnessItems = new ArrayList<>();
-        this.lockTime = new LittleEndianUInt32(0);
+        this.lockTime = new EpochDatetime(0);
     }
 
     /**
@@ -63,18 +64,16 @@ public class BitcoinTransaction implements Serializable, Writable {
      * @param lockTime
      */
     public BitcoinTransaction(long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, long lockTime) {
-
         this.marker = 1;
         this.flag = 0;
-        this.version = new LittleEndianUInt32(version);
+        this.version = new UInt32(version);
         this.inCounter = inCounter;
         this.inputs = listOfInputs;
         this.outCounter = outCounter;
         this.outputs = listOfOutputs;
         this.scriptWitnessItems = new ArrayList<>();
-        this.lockTime = new LittleEndianUInt32(lockTime);
+        this.lockTime = new EpochDatetime(lockTime);
     }
-
 
     /**
      * Creates a Bitcoin Transaction with Segwitness
@@ -92,13 +91,13 @@ public class BitcoinTransaction implements Serializable, Writable {
     public BitcoinTransaction(byte marker, byte flag, long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, List<BitcoinScriptWitnessItem> listOfScriptWitnessItem, long lockTime) {
         this.marker = marker;
         this.flag = flag;
-        this.version = new LittleEndianUInt32(version);
+        this.version = new UInt32(version);
         this.inCounter = inCounter;
         this.inputs = listOfInputs;
         this.outCounter = outCounter;
         this.outputs = listOfOutputs;
         this.scriptWitnessItems = listOfScriptWitnessItem;
-        this.lockTime = new LittleEndianUInt32(lockTime);
+        this.lockTime = new EpochDatetime(lockTime);
     }
 
     public long getVersion() {
@@ -138,7 +137,7 @@ public class BitcoinTransaction implements Serializable, Writable {
     }
 
     public void set(BitcoinTransaction newTransaction) {
-        this.version = new LittleEndianUInt32(newTransaction.getVersion());
+        this.version = new UInt32(newTransaction.getVersion());
         this.marker = newTransaction.getMarker();
         this.flag = newTransaction.getFlag();
         this.inCounter = newTransaction.getInCounter();
@@ -146,8 +145,7 @@ public class BitcoinTransaction implements Serializable, Writable {
         this.outCounter = newTransaction.getOutCounter();
         this.outputs = newTransaction.getListOfOutputs();
         this.scriptWitnessItems = newTransaction.getBitcoinScriptWitness();
-        this.lockTime = new LittleEndianUInt32(newTransaction.getLockTime());
-
+        this.lockTime = new EpochDatetime(newTransaction.getLockTime());
     }
 
     @Override
