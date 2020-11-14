@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
@@ -122,11 +123,12 @@ public class BitcoinBlockReader {
         }
         // start parsing
         // initialize byte arrays
-        byte[] currentMagicNo = new byte[4];
+//        byte[] currentMagicNo = new byte[4];
         byte[] currentHashMerkleRoot = new byte[32];
         byte[] currentHashPrevBlock = new byte[32];
         // magic no
-        rawByteBuffer.get(currentMagicNo, 0, 4);
+        Magic currentMagicNo = new Magic(rawByteBuffer);
+//        rawByteBuffer.get(currentMagicNo, 0, 4);
         // blocksize
         UInt32 currentBlockSize = new UInt32(rawByteBuffer);
         // version
@@ -640,7 +642,8 @@ public class BitcoinBlockReader {
      *
      */
     private byte[] skipBlocksNotInFilter() throws IOException {
-        byte[] magicNo = new byte[4];
+//        byte[] magicNo = new byte[4];
+        Magic magicNo = new Magic(0);
         byte[] blockSizeByte = new byte[4];
         // mark bytestream so we can peak into it
         this.bin.mark(8);
@@ -648,7 +651,7 @@ public class BitcoinBlockReader {
         int maxByteRead = 4;
         int totalByteRead = 0;
         int readByte;
-        while ((readByte = this.bin.read(magicNo, totalByteRead, maxByteRead - totalByteRead)) > -1) {
+        while ((readByte = this.bin.read(magicNo.getBytes(), totalByteRead, maxByteRead - totalByteRead)) > -1) {
             totalByteRead += readByte;
             if (totalByteRead >= maxByteRead) {
                 break;
@@ -672,13 +675,13 @@ public class BitcoinBlockReader {
             return new byte[0];
         }
 
-        long blockSize = BitcoinUtil.getSize(blockSizeByte) + 8;
+        long blockSize = new UInt32(blockSizeByte).getValue() + 8;
         // read the full block
         this.bin.reset();
         //filter by magic numbers?
         if (filterSpecificMagic) {
             for (byte[] filter : specificMagicByteArray) {
-                if (BitcoinUtil.compareMagics(filter, magicNo)) {
+                if (new Magic(filter).equals(magicNo)) {
                     return blockSizeByte;
                 }
             }

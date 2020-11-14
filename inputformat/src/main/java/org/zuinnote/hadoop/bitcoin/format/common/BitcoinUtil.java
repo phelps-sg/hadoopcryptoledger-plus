@@ -16,6 +16,7 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 
@@ -280,18 +281,10 @@ public class BitcoinUtil {
      * @param magic1 first magic
      * @param magic2 second magics
      * @return false, if do not match, true if match
+     * @deprecated Replaced by Magic.equals().
      */
     public static boolean compareMagics(byte[] magic1, byte[] magic2) {
-        if (magic1.length != magic2.length) {
-            return false;
-        }
-        for (int i = 0; i < magic1.length; i++) {
-            if (magic1[i] != magic2[i]) {
-                return false;
-            }
-        }
-        return true;
-
+        return new Magic(magic1).equals(new Magic(magic2));
     }
 
     /**

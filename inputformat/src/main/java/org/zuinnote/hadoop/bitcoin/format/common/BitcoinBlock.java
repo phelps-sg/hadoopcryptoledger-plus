@@ -20,6 +20,7 @@ import java.io.*;
 
 import org.apache.hadoop.io.Writable;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
@@ -43,7 +44,8 @@ public class BitcoinBlock implements Serializable, Writable {
     public static final int HEADER_SIZE_BYTES = 6*32;
 
     private UInt32 blockSize;
-    private byte[] magicNo;
+//    private byte[] magicNo;
+    private Magic magicNo;
     private UInt32 version;
     private EpochDatetime time;
     private UInt32 bits;
@@ -54,7 +56,7 @@ public class BitcoinBlock implements Serializable, Writable {
     private BitcoinAuxPOW auxPOW;
 
     public BitcoinBlock() {
-        this.magicNo = new byte[0];
+        this.magicNo = new Magic(0);
         this.hashPrevBlock = new byte[0];
         this.hashMerkleRoot = new byte[0];
         this.transactions = new ArrayList<>();
@@ -69,11 +71,11 @@ public class BitcoinBlock implements Serializable, Writable {
         this.blockSize = blockSize;
     }
 
-    public byte[] getMagicNo() {
+    public Magic getMagicNo() {
         return this.magicNo;
     }
 
-    public void setMagicNo(byte[] magicNo) {
+    public void setMagicNo(Magic magicNo) {
         this.magicNo = magicNo;
     }
 
