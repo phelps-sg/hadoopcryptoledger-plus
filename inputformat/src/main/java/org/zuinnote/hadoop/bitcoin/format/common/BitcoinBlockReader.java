@@ -488,13 +488,12 @@ public class BitcoinBlockReader {
     }
 
 
-    /*
+    /**
      * Finds the start of a block by looking for the specified magics in the current InputStream
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors reading Blockchain data
      *
      */
-
     private void findMagic() throws IOException {
         // search if first byte of any magic matches
         // search up to maximum size of a bitcoin block
@@ -522,13 +521,12 @@ public class BitcoinBlockReader {
         }
     }
 
-    /*
+    /**
      * Checks if there is a full Bitcoin Block at the current position of the InputStream
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors reading Blockchain data
      *
      */
-
     private void checkFullBlock() throws BitcoinBlockReadException {
         // now we can check that we have a full block
         try {
