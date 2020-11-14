@@ -16,7 +16,9 @@
 
 package org.zuinnote.hadoop.bitcoin.format.exception;
 
-public class BitcoinBlockReadException extends Exception {
+import java.io.IOException;
+
+public class BitcoinBlockReadException extends IOException {
 
     public BitcoinBlockReadException(String message) {
         super(message);

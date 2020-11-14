@@ -115,7 +115,7 @@ public class BitcoinBlockReader {
      * @return BitcoinBlock
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors of reading the Bitcoin Blockchain data
      */
-    public BitcoinBlock readBlock() throws BitcoinBlockReadException {
+    public BitcoinBlock readBlock() throws IOException {
         ByteBuffer rawByteBuffer = readRawBlock();
         if (rawByteBuffer == null) {
             return null;
@@ -421,57 +421,51 @@ public class BitcoinBlockReader {
      **/
 
 
-    public ByteBuffer readRawBlock() throws BitcoinBlockReadException {
-        try {
-            byte[] blockSizeByte = new byte[0];
-            while (blockSizeByte.length == 0) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
-                // check if more to read
-                if (this.bin.available() < 1) {
-                    return null;
-                }
-                blockSizeByte = skipBlocksNotInFilter();
+    public ByteBuffer readRawBlock() throws IOException {
+        byte[] blockSizeByte = new byte[0];
+        while (blockSizeByte.length == 0) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
+            // check if more to read
+            if (this.bin.available() < 1) {
+                return null;
             }
-            // check if it is larger than maxsize, include 8 bytes for the magic and size header
-            long blockSize = BitcoinUtil.getSize(blockSizeByte) + 8;
-            if (blockSize == 0) {
-                throw new BitcoinBlockReadException("Error: Blocksize too small");
-            }
-            if (blockSize < 0) {
-                throw new BitcoinBlockReadException("Error: This block size cannot be handled currently (larger then largest number in positive signed int)");
-            }
-            if (blockSize > this.maxSizeBitcoinBlock) {
-                throw new BitcoinBlockReadException("Error: Block size is larger then defined in configuration - Please increase it if this is a valid block");
-            }
-            // read full block into ByteBuffer
-            int blockSizeInt = (int) (blockSize);
-            byte[] fullBlock = new byte[blockSizeInt];
-            int totalByteRead = 0;
-            int readByte;
-            while ((readByte = this.bin.read(fullBlock, totalByteRead, blockSizeInt - totalByteRead)) > -1) {
-                totalByteRead += readByte;
-                if (totalByteRead >= blockSize) {
-                    break;
-                }
-            }
-            if (totalByteRead != blockSize) {
-                throw new BitcoinBlockReadException("Error: Could not read full block");
-            }
-            ByteBuffer result;
-            if (!(this.useDirectBuffer)) {
-                result = ByteBuffer.wrap(fullBlock);
-            } else {
-                preAllocatedDirectByteBuffer.clear(); // clear out old bytebuffer
-                preAllocatedDirectByteBuffer.limit(fullBlock.length); // limit the bytebuffer
-                result = preAllocatedDirectByteBuffer;
-                result.put(fullBlock);
-                result.flip(); // put in read mode
-            }
-            result.order(ByteOrder.LITTLE_ENDIAN);
-            return result;
-        } catch (IOException e) {
-            LOG.error(e);
-            throw new BitcoinBlockReadException(e.toString());
+            blockSizeByte = skipBlocksNotInFilter();
         }
+        // check if it is larger than maxsize, include 8 bytes for the magic and size header
+        int blockSize = new UInt32(blockSizeByte).intValue() + 8;
+        if (blockSize == 0) {
+            throw new BitcoinBlockReadException("Error: Blocksize too small");
+        }
+        if (blockSize < 0) {
+            throw new BitcoinBlockReadException("Error: This block size cannot be handled currently (larger then largest number in positive signed int)");
+        }
+        if (blockSize > this.maxSizeBitcoinBlock) {
+            throw new BitcoinBlockReadException("Error: Block size is larger then defined in configuration - Please increase it if this is a valid block");
+        }
+        // read full block into ByteBuffer
+        byte[] fullBlock = new byte[blockSize];
+        int totalByteRead = 0;
+        int readByte;
+        while ((readByte = this.bin.read(fullBlock, totalByteRead, blockSize - totalByteRead)) > -1) {
+            totalByteRead += readByte;
+            if (totalByteRead >= blockSize) {
+                break;
+            }
+        }
+        if (totalByteRead != blockSize) {
+            throw new BitcoinBlockReadException("Error: Could not read full block");
+        }
+        ByteBuffer result;
+        if (!(this.useDirectBuffer)) {
+            result = ByteBuffer.wrap(fullBlock);
+        } else {
+            preAllocatedDirectByteBuffer.clear(); // clear out old bytebuffer
+            preAllocatedDirectByteBuffer.limit(fullBlock.length); // limit the bytebuffer
+            result = preAllocatedDirectByteBuffer;
+            result.put(fullBlock);
+            result.flip(); // put in read mode
+        }
+        result.order(ByteOrder.LITTLE_ENDIAN);
+        return result;
     }
 
     /**
