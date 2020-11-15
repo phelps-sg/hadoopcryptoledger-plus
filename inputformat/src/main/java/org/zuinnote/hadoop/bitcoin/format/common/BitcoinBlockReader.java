@@ -102,7 +102,7 @@ public class BitcoinBlockReader {
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
-    public void seekBlockStart() throws BitcoinBlockReadException {
+    public void seekBlockStart() throws IOException {
         if (!(this.filterSpecificMagic)) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no magic(s) are defined.");
         }
@@ -495,42 +495,28 @@ public class BitcoinBlockReader {
      *
      */
 
-    private void findMagic() throws BitcoinBlockReadException {
+    private void findMagic() throws IOException {
         // search if first byte of any magic matches
         // search up to maximum size of a bitcoin block
         int currentSeek = 0;
         while (currentSeek != this.maxSizeBitcoinBlock) {
             int firstByte = -1;
-            try {
-                this.bin.mark(4); // magic is always 4 bytes
-                firstByte = this.bin.read();
-            } catch (IOException e) {
-                LOG.error(e);
-                throw new BitcoinBlockReadException(e.toString());
-            }
+            this.bin.mark(4); // magic is always 4 bytes
+            firstByte = this.bin.read();
             if (firstByte == -1) {
                 throw new BitcoinBlockReadException("Error: Did not find defined magic within current stream");
             }
-            try {
-                if (checkForMagicBytes(firstByte)) {
-                    return;
-                }
-            } catch (IOException e) {
-                LOG.error(e);
-                throw new BitcoinBlockReadException(e.toString());
+            if (checkForMagicBytes(firstByte)) {
+                return;
             }
             if (currentSeek == this.maxSizeBitcoinBlock) {
                 throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found within the maximum size of a Bitcoin block. Check data or increase maximum size of Bitcoin block.");
             }
             // increase by one byte if magic not found yet
-            try {
-                this.bin.reset();
-                if (this.bin.skip(1) != 1) {
-                    LOG.error("Error cannot skip 1 byte in InputStream");
-                }
-            } catch (IOException e) {
-                LOG.error(e);
-                throw new BitcoinBlockReadException(e.toString());
+            this.bin.reset();
+            if (this.bin.skip(1) != 1) {
+                //TODO: Exception?
+                LOG.error("Error cannot skip 1 byte in InputStream");
             }
             currentSeek++;
         }
