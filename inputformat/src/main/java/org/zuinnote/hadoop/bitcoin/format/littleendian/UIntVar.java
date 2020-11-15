@@ -16,8 +16,6 @@
 
 package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

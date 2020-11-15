@@ -20,6 +20,7 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
@@ -31,13 +32,13 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     private static final long serialVersionUID = 2854570630540937753L;
 
     private BigInteger value;
-    private byte[] txOutScriptLength;
+    private UIntVar txOutScriptLength;
     private byte[] txOutScript;
 
     //TODO Configure from magic?
     protected static NetworkParameters networkParameters = MainNetParams.get();
 
-    public BitcoinTransactionOutput(BigInteger value, byte[] txOutScriptLength, byte[] txOutScript) {
+    public BitcoinTransactionOutput(BigInteger value, UIntVar txOutScriptLength, byte[] txOutScript) {
         this.value = value;
         this.txOutScriptLength = txOutScriptLength;
         this.txOutScript = txOutScript;
@@ -47,7 +48,7 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
         return this.value;
     }
 
-    public byte[] getTxOutScriptLength() {
+    public UIntVar getTxOutScriptLength() {
         return this.txOutScriptLength;
     }
 
@@ -71,7 +72,7 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     @Override
     public byte[] getBytes() {
         return new Bytes(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8),
-                txOutScriptLength, txOutScript).getBytes();
+                                txOutScriptLength, txOutScript).getBytes();
     }
 
 }
