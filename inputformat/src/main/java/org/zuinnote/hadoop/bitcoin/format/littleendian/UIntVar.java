@@ -19,8 +19,16 @@ package org.zuinnote.hadoop.bitcoin.format.littleendian;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * An unsigned integer stored in little-endian format with a variable-number of bytes (1, 3, 5, or 9) depending
+ * on the magnitude being represented.
+ * See <a href="https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer">the protocol documentation</a>.
+ */
 public class UIntVar extends UInt {
 
+    /**
+     * The total number of bytes used to store the integer (excluding the header byte).
+     */
     protected int numBytes;
 
     public UIntVar(byte[] value) {
