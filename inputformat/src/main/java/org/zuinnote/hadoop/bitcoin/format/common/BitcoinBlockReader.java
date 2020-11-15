@@ -241,7 +241,7 @@ public class BitcoinBlockReader {
      */
     public List<BitcoinTransaction> parseTransactions(ByteBuffer buffer) {
         long noOfTransactions = new UIntVar(buffer).longValue();
-        ArrayList<BitcoinTransaction> resultTransactions = new ArrayList<>((int) noOfTransactions);
+        ArrayList<BitcoinTransaction> result = new ArrayList<>((int) noOfTransactions);
         for (int k = 0; k < noOfTransactions; k++) {
             UInt32 version = new UInt32(buffer);
             UIntVar inCounter = new UIntVar(buffer);
@@ -291,10 +291,10 @@ public class BitcoinBlockReader {
                 scriptWitnessItems = new ArrayList<>();
             }
             EpochDatetime lockTime = new EpochDatetime(buffer);
-            resultTransactions.add(new BitcoinTransaction(version, marker, flag, inCounter, outCounter,
+            result.add(new BitcoinTransaction(version, marker, flag, inCounter, outCounter,
                                                                 inputs, outputs, scriptWitnessItems, lockTime));
         }
-        return resultTransactions;
+        return result;
     }
 
     /**
@@ -528,31 +528,24 @@ public class BitcoinBlockReader {
     }
 
     /**
-     * Skips blocks in inputStream which are not specified in the magic filter
+     * Read the magic and blockSize fields in the header and return the raw block size as Long,
+     * or null iff filterSpecificMagic is true, and the magic read does not match any of those specified
+     * in specificMagicByteArray.
      *
-     * @return null or byte array containing the size of the block (not the block itself)
+     * @return null, or the raw size of the block excluding the magic and blockSize fields.
      *
      * @throws java.io.IOException in case of errors reading from InputStream
-     *
      */
     private Long skipBlocksNotInFilter() throws IOException {
         this.bin.mark(8);
         Magic magicNo = new Magic(bin);
         UInt32 blockSize = new UInt32(bin);
         this.bin.reset();
-
-        //filter by magic numbers?
         if (filterSpecificMagic) {
             for (byte[] filter : specificMagicByteArray) {
                 if (new Magic(filter).equals(magicNo)) {
                     return blockSize.getValue();
                 }
-            }
-            // Skip block if not found
-            int n = blockSize.intValue() + 8;
-            if (this.bin.skip(n) != n) {
-                //TODO exception?
-                LOG.error("Cannot skip block in InputStream");
             }
             return null;
         } else {
