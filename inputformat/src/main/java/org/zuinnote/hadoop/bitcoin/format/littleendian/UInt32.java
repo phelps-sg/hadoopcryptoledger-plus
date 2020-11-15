@@ -18,6 +18,9 @@ package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -47,6 +50,14 @@ public class UInt32 extends UInt {
 
     public UInt32(ByteBuffer value) {
         super(value);
+    }
+
+    public UInt32(DataInput input) throws IOException {
+        super(input);
+    }
+
+    public UInt32(InputStream input) throws IOException {
+        super(input);
     }
 
     public int getNumBytes() {
