@@ -294,7 +294,6 @@ public class BitcoinBlockReader {
                 // for each transaction input there is at least some segwit data item
                 // read scriptWitness size
 
-
                 currentListOfTransactionSegwits = new ArrayList<>();
                 for (int i = 0; i < currentNoOfInputs; i++) {
                     // get no of witness items for input
@@ -326,7 +325,7 @@ public class BitcoinBlockReader {
     }
 
 
-    /*
+    /**
      * Parses the Bitcoin transaction inputs in a byte buffer.
      *
      * @param rawByteBuffer ByteBuffer from which the transaction inputs have to be parsed
@@ -359,11 +358,11 @@ public class BitcoinBlockReader {
         return currentTransactionInput;
     }
 
-    /*
+    /**
      * Parses the Bitcoin transaction outputs in a byte buffer.
      *
      * @param rawByteBuffer ByteBuffer from which the transaction outputs have to be parsed
-     * @param noOfTransactionInputs Number of expected transaction outputs
+     * @param noOfTransactionOutputs Number of expected transaction outputs
      *
      * @return Array of transactions
      *
@@ -388,7 +387,7 @@ public class BitcoinBlockReader {
         return currentTransactionOutput;
     }
 
-    /*
+    /**
      * Reads a raw Bitcoin block into a ByteBuffer. This method is recommended if you are only interested in a small part of the block and do not need the deserialization of the full block, ie in case you generally skip a lot of blocks
      *
      *
@@ -396,8 +395,6 @@ public class BitcoinBlockReader {
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
-
-
     public ByteBuffer readRawBlock() throws IOException {
         byte[] blockSizeByte = new byte[0];
         while (blockSizeByte.length == 0) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
@@ -567,7 +564,7 @@ public class BitcoinBlockReader {
     }
 
 
-    /*
+    /**
      * Skips blocks in inputStream which are not specified in the magic filter
      *
      * @return null or byte array containing the size of the block (not the block itself)
@@ -637,7 +634,6 @@ public class BitcoinBlockReader {
      * @throws java.io.IOException in case of issues reading from BufferedInputStream
      * @retrun true if one of the magics has been identified, false if not
      */
-
     private boolean checkForMagicBytes(int firstByte) throws IOException {
         byte[] fullMagic = null;
         for (int i = 0; i < this.specificMagicByteArray.length; i++) {
