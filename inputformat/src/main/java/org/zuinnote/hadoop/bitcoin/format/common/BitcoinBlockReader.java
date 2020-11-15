@@ -24,7 +24,6 @@ import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
-import sun.security.provider.SHA;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
