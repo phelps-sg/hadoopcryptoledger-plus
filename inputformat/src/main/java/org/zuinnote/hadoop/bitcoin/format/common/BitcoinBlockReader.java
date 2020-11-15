@@ -19,10 +19,7 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.*;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
 import java.io.BufferedInputStream;
@@ -134,12 +131,7 @@ public class BitcoinBlockReader {
         UInt32 bits = new UInt32(buffer);
         UInt32 nonce = new UInt32(buffer);
         BitcoinAuxPOW auxPOW = parseAuxPow(buffer);
-        long transactionCounter = BitcoinUtil.convertVarIntByteBufferToLong(buffer);
-
-        List<BitcoinTransaction> transactions = parseTransactions(buffer, transactionCounter);
-        if (transactions.size() != transactionCounter) {
-            throw new BitcoinBlockReadException("Error: Number of Transactions (" + transactions.size() + ") does not correspond to transaction counter in block (" + transactionCounter + ")");
-        }
+        List<BitcoinTransaction> transactions = parseTransactions(buffer);
 
         return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
                                         hashMerkleRoot, transactions, auxPOW);
@@ -148,23 +140,23 @@ public class BitcoinBlockReader {
     /**
      * Parses AuxPOW information (cf. https://en.bitcoin.it/wiki/Merged_mining_specification)
      *
-     * @param rawByteBuffer
+     * @param buffer
      * @return
      */
-    public BitcoinAuxPOW parseAuxPow(ByteBuffer rawByteBuffer) {
+    public BitcoinAuxPOW parseAuxPow(ByteBuffer buffer) {
         if (!this.readAuxPow) {
             return null;
         }
         // in case it does not contain auxpow we need to reset
-        rawByteBuffer.mark();
-        int currentVersion = rawByteBuffer.getInt();
-        byte[] currentInCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
+        buffer.mark();
+        UInt32 version = new UInt32(buffer);
+        UIntVar inCounter = new UIntVar(buffer);
         byte[] currentTransactionInputPrevTransactionHash = new byte[32];
-        rawByteBuffer.get(currentTransactionInputPrevTransactionHash, 0, 32);
+        buffer.get(currentTransactionInputPrevTransactionHash, 0, 32);
         byte[] prevTxOutIdx = new byte[4];
-        rawByteBuffer.get(prevTxOutIdx, 0, 4);
+        buffer.get(prevTxOutIdx, 0, 4);
         // detect auxPow
-        rawByteBuffer.reset();
+        buffer.reset();
         byte[] expectedPrevTransactionHash = new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
         byte[] expectedPrevOutIdx = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
 
@@ -173,28 +165,29 @@ public class BitcoinBlockReader {
         }
         // continue reading auxPow
         // txIn (for all of them)
-        currentVersion = rawByteBuffer.getInt();
+        version = new UInt32(buffer);
 
-        currentInCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-        long currentNoOfInputs = BitcoinUtil.getVarInt(currentInCounterVarInt);
-        List<BitcoinTransactionInput> currentTransactionInput = parseTransactionInputs(rawByteBuffer, currentNoOfInputs);
+        inCounter = new UIntVar(buffer);
+        List<BitcoinTransactionInput> inputs = parseTransactionInputs(buffer, inCounter.intValue());
 
         // txOut (for all of them)
-        byte[] currentOutCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-        long currentNoOfOutput = BitcoinUtil.getVarInt(currentOutCounterVarInt);
-        List<BitcoinTransactionOutput> currentTransactionOutput = parseTransactionOutputs(rawByteBuffer, currentNoOfOutput);
-        int lockTime = rawByteBuffer.getInt();
-        BitcoinTransaction coinbaseTransaction = new BitcoinTransaction(currentVersion, currentInCounterVarInt, currentTransactionInput, currentOutCounterVarInt, currentTransactionOutput, lockTime);
+        UIntVar outCounter = new UIntVar(buffer);
+//        byte[] currentOutCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(buffer);
+//        long currentNoOfOutput = BitcoinUtil.getVarInt(currentOutCounterVarInt);
+        List<BitcoinTransactionOutput> outputs = parseTransactionOutputs(buffer, outCounter.intValue());
+        EpochDatetime lockTime = new EpochDatetime(buffer);
+        BitcoinTransaction coinbaseTransaction =
+                new BitcoinTransaction(version, inCounter, outCounter, inputs, outputs, null, lockTime);
 
         // read branches
         // coinbase branch
         byte[] coinbaseParentBlockHeaderHash = new byte[32];
-        rawByteBuffer.get(coinbaseParentBlockHeaderHash, 0, 32);
+        buffer.get(coinbaseParentBlockHeaderHash, 0, 32);
 
-        BitcoinAuxPOWBranch coinbaseBranch = parseAuxPOWBranch(rawByteBuffer);
+        BitcoinAuxPOWBranch coinbaseBranch = parseAuxPOWBranch(buffer);
 
         // auxchain branch
-        BitcoinAuxPOWBranch auxChainBranch = parseAuxPOWBranch(rawByteBuffer);
+        BitcoinAuxPOWBranch auxChainBranch = parseAuxPOWBranch(buffer);
 
         // parent Block header
 
@@ -203,20 +196,20 @@ public class BitcoinBlockReader {
         byte[] parentBlockHashPrevBlock = new byte[32];
 
         // version
-        int parentBlockVersion = rawByteBuffer.getInt();
+        int parentBlockVersion = buffer.getInt();
         // hashPrevBlock
-        rawByteBuffer.get(parentBlockHashPrevBlock, 0, 32);
+        buffer.get(parentBlockHashPrevBlock, 0, 32);
         // hashMerkleRoot
-        rawByteBuffer.get(parentBlockHashMerkleRoot, 0, 32);
+        buffer.get(parentBlockHashMerkleRoot, 0, 32);
         // time
-        int parentBlockTime = rawByteBuffer.getInt();
+        int parentBlockTime = buffer.getInt();
         // bits/difficulty
-        rawByteBuffer.get(parentBlockBits, 0, 4);
+        buffer.get(parentBlockBits, 0, 4);
         // nonce
-        int parentBlockNonce = rawByteBuffer.getInt();
+        int parentBlockNonce = buffer.getInt();
         BitcoinAuxPOWBlockHeader parentBlockheader = new BitcoinAuxPOWBlockHeader(parentBlockVersion, parentBlockHashPrevBlock, parentBlockHashMerkleRoot, parentBlockTime, parentBlockBits, parentBlockNonce);
 
-        return new BitcoinAuxPOW(currentVersion, coinbaseTransaction, coinbaseParentBlockHeaderHash, coinbaseBranch, auxChainBranch, parentBlockheader);
+        return new BitcoinAuxPOW(version, coinbaseTransaction, coinbaseParentBlockHeaderHash, coinbaseBranch, auxChainBranch, parentBlockheader);
     }
 
     /**
@@ -243,83 +236,63 @@ public class BitcoinBlockReader {
     /**
      * Parses the Bitcoin transactions in a byte buffer.
      *
-     * @param rawByteBuffer    ByteBuffer from which the transactions have to be parsed
-     * @param noOfTransactions Number of expected transactions
+     * @param buffer    ByteBuffer from which the transactions have to be parsed
      * @return Array of transactions
      */
-    public List<BitcoinTransaction> parseTransactions(ByteBuffer rawByteBuffer, long noOfTransactions) {
+    public List<BitcoinTransaction> parseTransactions(ByteBuffer buffer) {
+        long noOfTransactions = new UIntVar(buffer).longValue();
         ArrayList<BitcoinTransaction> resultTransactions = new ArrayList<>((int) noOfTransactions);
-        // read all transactions from ByteBuffer
         for (int k = 0; k < noOfTransactions; k++) {
-            // read version
-            int currentVersion = rawByteBuffer.getInt();
-            // read inCounter
-            byte[] currentInCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
+            UInt32 version = new UInt32(buffer);
+            UIntVar inCounter = new UIntVar(buffer);
 
-            long currentNoOfInputs = BitcoinUtil.getVarInt(currentInCounterVarInt);
             boolean segwit = false;
             byte marker = 1;
             byte flag = 0;
             // check segwit marker
-            if (currentNoOfInputs == 0) {
+            if (inCounter.intValue() == 0) {
                 // this seems to be segwit - lets be sure
                 // check segwit flag
-                rawByteBuffer.mark();
-                byte segwitFlag = rawByteBuffer.get();
+                buffer.mark();
+                byte segwitFlag = buffer.get();
                 if (segwitFlag != 0) {
                     // load the real number of inputs
                     segwit = true;
                     marker = 0;
                     flag = segwitFlag;
-                    currentInCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-                    currentNoOfInputs = BitcoinUtil.getVarInt(currentInCounterVarInt);
+                    inCounter = new UIntVar(buffer);
                 } else {
-                    //TODO Exception?
+                    //TODO Exception/assertion?
                     LOG.warn("It seems a block with 0 transaction inputs was found");
-                    rawByteBuffer.reset();
+                    buffer.reset();
                 }
             }
-            // read inputs
-            List<BitcoinTransactionInput> currentTransactionInput = parseTransactionInputs(rawByteBuffer, currentNoOfInputs);
 
-            // read outCounter
-            byte[] currentOutCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-            long currentNoOfOutput = BitcoinUtil.getVarInt(currentOutCounterVarInt);
-            // read outputs
-            List<BitcoinTransactionOutput> currentTransactionOutput = parseTransactionOutputs(rawByteBuffer, currentNoOfOutput);
+            List<BitcoinTransactionInput> inputs = parseTransactionInputs(buffer, inCounter.intValue());
+            UIntVar outCounter = new UIntVar(buffer);
+            List<BitcoinTransactionOutput> outputs = parseTransactionOutputs(buffer, outCounter.intValue());
 
-            List<BitcoinScriptWitnessItem> currentListOfTransactionSegwits;
+            List<BitcoinScriptWitnessItem> scriptWitnessItems;
             if (segwit) {
-                // read segwit data
-                // for each transaction input there is at least some segwit data item
-                // read scriptWitness size
-
-                currentListOfTransactionSegwits = new ArrayList<>();
-                for (int i = 0; i < currentNoOfInputs; i++) {
-                    // get no of witness items for input
-                    byte[] currentWitnessCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-                    long currentNoOfWitnesses = BitcoinUtil.getVarInt(currentWitnessCounterVarInt);
-                    List<BitcoinScriptWitness> currentTransactionSegwit = new ArrayList<>((int) currentNoOfWitnesses);
-                    for (int j = 0; j < (int) currentNoOfWitnesses; j++) {
-                        // read size of segwit script
-                        byte[] currentTransactionSegwitScriptLength = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-                        long currentTransactionSegwitScriptSize = BitcoinUtil.getVarInt(currentTransactionSegwitScriptLength);
-                        int currentTransactionSegwitScriptSizeInt = (int) currentTransactionSegwitScriptSize;
+                scriptWitnessItems = new ArrayList<>();
+                for (int i = 0; i < inCounter.intValue(); i++) {
+                    UIntVar witnessCounter = new UIntVar(buffer);
+                    List<BitcoinScriptWitness> currentTransactionSegwit = new ArrayList<>(witnessCounter.intValue());
+                    for (int j = 0; j < witnessCounter.intValue(); j++) {
+                        UIntVar segwitScriptLength = new UIntVar(buffer);
                         // read segwit script
-                        byte[] currentTransactionInSegwitScript = new byte[currentTransactionSegwitScriptSizeInt];
-                        rawByteBuffer.get(currentTransactionInSegwitScript, 0, currentTransactionSegwitScriptSizeInt);
-                        // add segwit
-                        currentTransactionSegwit.add(new BitcoinScriptWitness(currentTransactionSegwitScriptLength, currentTransactionInSegwitScript));
+                        byte[] currentTransactionInSegwitScript = new byte[segwitScriptLength.intValue()];
+                        buffer.get(currentTransactionInSegwitScript, 0, segwitScriptLength.intValue());
+                        currentTransactionSegwit.add(new BitcoinScriptWitness(segwitScriptLength, currentTransactionInSegwitScript));
                     }
-                    currentListOfTransactionSegwits.add(new BitcoinScriptWitnessItem(currentWitnessCounterVarInt, currentTransactionSegwit));
+                    scriptWitnessItems.add(new BitcoinScriptWitnessItem(witnessCounter, currentTransactionSegwit));
                 }
             } else {
-                currentListOfTransactionSegwits = new ArrayList<>();
+                scriptWitnessItems = new ArrayList<>();
             }
-            // lock_time
-            int currentTransactionLockTime = rawByteBuffer.getInt();
-            // add transaction
-            resultTransactions.add(new BitcoinTransaction(marker, flag, currentVersion, currentInCounterVarInt, currentTransactionInput, currentOutCounterVarInt, currentTransactionOutput, currentListOfTransactionSegwits, currentTransactionLockTime));
+            EpochDatetime lockTime = new EpochDatetime(buffer);
+            resultTransactions.add(new BitcoinTransaction(version, marker, flag, inCounter, outCounter,
+                                                                inputs, outputs, scriptWitnessItems, lockTime));
         }
         return resultTransactions;
     }
@@ -334,23 +307,17 @@ public class BitcoinBlockReader {
     public List<BitcoinTransactionInput> parseTransactionInputs(ByteBuffer buffer, long numInputs) {
         ArrayList<BitcoinTransactionInput> inputs = new ArrayList<>((int) numInputs);
         for (int i = 0; i < numInputs; i++) {
-
             HashSHA256 prevTransactionHash = new HashSHA256(buffer);
             UInt32 prevTxOutIdx = new UInt32(buffer);
 
-            // read InScript length (Potential Internal Exceed Java Type)
-            byte[] inScriptLengthVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(buffer);
-            long txInScriptSize = BitcoinUtil.getVarInt(inScriptLengthVarInt);
-
             // read inScript
-            int txInScriptSizeInt = (int) txInScriptSize;
-            byte[] inScript = new byte[txInScriptSizeInt];
-            buffer.get(inScript, 0, txInScriptSizeInt);
+            UIntVar inScriptLength = new UIntVar(buffer);
+            byte[] inScript = new byte[inScriptLength.intValue()];
+            buffer.get(inScript, 0, inScriptLength.intValue());
 
             UInt32 seqNo = new UInt32(buffer);
 
-            inputs.add(new BitcoinTransactionInput(prevTransactionHash, prevTxOutIdx, inScriptLengthVarInt,
-                                                        inScript, seqNo));
+            inputs.add(new BitcoinTransactionInput(prevTransactionHash, prevTxOutIdx, inScriptLength, inScript, seqNo));
         }
         return inputs;
     }
@@ -365,22 +332,22 @@ public class BitcoinBlockReader {
      *
      */
     public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer rawByteBuffer, long noOfTransactionOutputs) {
+
         ArrayList<BitcoinTransactionOutput> currentTransactionOutput = new ArrayList<>((int) (noOfTransactionOutputs));
         for (int i = 0; i < noOfTransactionOutputs; i++) {
-            // read value
 
+            // read value
             byte[] currentTransactionOutputValueArray = new byte[8];
             rawByteBuffer.get(currentTransactionOutputValueArray);
             BigInteger currentTransactionOutputValue = new BigInteger(1, EthereumUtil.reverseByteArray(currentTransactionOutputValueArray));
-            // read outScript length (Potential Internal Exceed Java Type)
-            byte[] currentTransactionTxOutScriptLengthVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-            long currentTransactionTxOutScriptSize = BitcoinUtil.getVarInt(currentTransactionTxOutScriptLengthVarInt);
-            int currentTransactionTxOutScriptSizeInt = (int) (currentTransactionTxOutScriptSize);
+
             // read outScript
-            byte[] currentTransactionOutScript = new byte[currentTransactionTxOutScriptSizeInt];
-            rawByteBuffer.get(currentTransactionOutScript, 0, currentTransactionTxOutScriptSizeInt);
-            currentTransactionOutput.add(new BitcoinTransactionOutput(currentTransactionOutputValue, currentTransactionTxOutScriptLengthVarInt, currentTransactionOutScript));
+            UIntVar txOutScriptLength = new UIntVar(rawByteBuffer);
+            byte[] currentTransactionOutScript = new byte[txOutScriptLength.intValue()];
+            rawByteBuffer.get(currentTransactionOutScript, 0, txOutScriptLength.intValue());
+            currentTransactionOutput.add(new BitcoinTransactionOutput(currentTransactionOutputValue, txOutScriptLength, currentTransactionOutScript));
         }
+
         return currentTransactionOutput;
     }
 

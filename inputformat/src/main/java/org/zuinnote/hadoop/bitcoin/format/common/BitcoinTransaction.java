@@ -21,21 +21,21 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Writable;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BitcoinTransaction implements Serializable, Writable {
 
     private UInt32 version;
-    private byte marker;
-    private byte flag;
-    private byte[] inCounter;
-    private byte[] outCounter;
+    private byte marker = 0x01;
+    private byte flag = 0x00;
+    private UIntVar inCounter;
+    private UIntVar outCounter;
     private List<BitcoinTransactionInput> inputs;
     private List<BitcoinTransactionOutput> outputs;
     private List<BitcoinScriptWitnessItem> scriptWitnessItems;
@@ -44,62 +44,32 @@ public class BitcoinTransaction implements Serializable, Writable {
     private static transient final Log LOG = LogFactory.getLog(BitcoinTransaction.class.getName());
 
     public BitcoinTransaction() {
-        this.version = new UInt32(0);
-        this.marker = 1;
-        this.flag = 0;
-        this.inCounter = new byte[0];
-        this.outCounter = new byte[0];
-        this.inputs = new ArrayList<>();
-        this.outputs = new ArrayList<>();
-        this.scriptWitnessItems = new ArrayList<>();
-        this.lockTime = new EpochDatetime(0);
     }
 
-    /**
-     * Creates a traditional Bitcoin Transaction without ScriptWitness
-     *
-     * @param version
-     * @param inCounter
-     * @param listOfInputs
-     * @param outCounter
-     * @param listOfOutputs
-     * @param lockTime
-     */
-    public BitcoinTransaction(long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, long lockTime) {
-        this.marker = 1;
-        this.flag = 0;
-        this.version = new UInt32(version);
-        this.inCounter = inCounter;
-        this.inputs = listOfInputs;
-        this.outCounter = outCounter;
-        this.outputs = listOfOutputs;
-        this.scriptWitnessItems = new ArrayList<>();
-        this.lockTime = new EpochDatetime(lockTime);
-    }
-
-    /**
-     * Creates a Bitcoin Transaction with Segwitness
-     *
-     * @param marker
-     * @param flag
-     * @param version
-     * @param inCounter
-     * @param listOfInputs
-     * @param outCounter
-     * @param listOfOutputs
-     * @param listOfScriptWitnessItem
-     * @param lockTime
-     */
-    public BitcoinTransaction(byte marker, byte flag, long version, byte[] inCounter, List<BitcoinTransactionInput> listOfInputs, byte[] outCounter, List<BitcoinTransactionOutput> listOfOutputs, List<BitcoinScriptWitnessItem> listOfScriptWitnessItem, long lockTime) {
+    public BitcoinTransaction(UInt32 version, UIntVar inCounter, UIntVar outCounter, List<BitcoinTransactionInput> inputs, List<BitcoinTransactionOutput> outputs, List<BitcoinScriptWitnessItem> scriptWitnessItems, EpochDatetime lockTime) {
+        this.version = version;
         this.marker = marker;
         this.flag = flag;
-        this.version = new UInt32(version);
         this.inCounter = inCounter;
-        this.inputs = listOfInputs;
         this.outCounter = outCounter;
-        this.outputs = listOfOutputs;
-        this.scriptWitnessItems = listOfScriptWitnessItem;
-        this.lockTime = new EpochDatetime(lockTime);
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.scriptWitnessItems = scriptWitnessItems;
+        this.lockTime = lockTime;
+        this.marker = 0x01;
+        this.flag = 0x00;
+    }
+
+    public BitcoinTransaction(UInt32 version, byte marker, byte flag, UIntVar inCounter, UIntVar outCounter, List<BitcoinTransactionInput> inputs, List<BitcoinTransactionOutput> outputs, List<BitcoinScriptWitnessItem> scriptWitnessItems, EpochDatetime lockTime) {
+        this.version = version;
+        this.marker = marker;
+        this.flag = flag;
+        this.inCounter = inCounter;
+        this.outCounter = outCounter;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.scriptWitnessItems = scriptWitnessItems;
+        this.lockTime = lockTime;
     }
 
     public long getVersion() {
@@ -114,7 +84,7 @@ public class BitcoinTransaction implements Serializable, Writable {
         return this.flag;
     }
 
-    public byte[] getInCounter() {
+    public UIntVar getInCounter() {
         return this.inCounter;
     }
 
@@ -122,7 +92,7 @@ public class BitcoinTransaction implements Serializable, Writable {
         return this.inputs;
     }
 
-    public byte[] getOutCounter() {
+    public UIntVar getOutCounter() {
         return this.outCounter;
     }
 
@@ -198,9 +168,7 @@ public class BitcoinTransaction implements Serializable, Writable {
             // wtxid is equal to its txid.
             boolean emptyWitness = true;
             for (BitcoinScriptWitnessItem currentItem : scriptWitnessItems) {
-                if (currentItem.getStackItemCounter().length > 1
-                        || ((currentItem.getStackItemCounter().length == 1)
-                        && (currentItem.getStackItemCounter()[0] != 0x00))) {
+                if (currentItem.getStackItemCounter().getValue() > 0) {
                     emptyWitness = false;
                     break;
                 }

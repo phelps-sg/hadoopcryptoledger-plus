@@ -15,11 +15,13 @@
  */
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
+
 import java.io.Serializable;
 
 public class BitcoinAuxPOW implements Serializable {
 
-    private int version;
+    private UInt32 version;
     private BitcoinTransaction coinbaseTransaction;
     private byte[] parentBlockHeaderHash;
     private BitcoinAuxPOWBranch coinbaseBranch;
@@ -30,14 +32,14 @@ public class BitcoinAuxPOW implements Serializable {
      * Creates an empty AuxPOW object in case the feature is not used (e.g. in the main Bitcoin blockchain)
      */
     public BitcoinAuxPOW() {
-        this.version = 0;
-        this.coinbaseTransaction = null;
-        this.coinbaseBranch = null;
-        this.auxBlockChainBranch = null;
-        this.parentBlockHeader = null;
+//        this.version = new U0;
+//        this.coinbaseTransaction = null;
+//        this.coinbaseBranch = null;
+//        this.auxBlockChainBranch = null;
+//        this.parentBlockHeader = null;
     }
 
-    public BitcoinAuxPOW(int version, BitcoinTransaction coinbaseTransaction, byte[] parentBlockHeaderHash, BitcoinAuxPOWBranch coinbaseBranch, BitcoinAuxPOWBranch auxBlockChainBranch, BitcoinAuxPOWBlockHeader parentBlockHeader) {
+    public BitcoinAuxPOW(UInt32 version, BitcoinTransaction coinbaseTransaction, byte[] parentBlockHeaderHash, BitcoinAuxPOWBranch coinbaseBranch, BitcoinAuxPOWBranch auxBlockChainBranch, BitcoinAuxPOWBlockHeader parentBlockHeader) {
         this.version = version;
         this.coinbaseTransaction = coinbaseTransaction;
         this.parentBlockHeaderHash = parentBlockHeaderHash;
@@ -46,7 +48,7 @@ public class BitcoinAuxPOW implements Serializable {
         this.parentBlockHeader = parentBlockHeader;
     }
 
-    public int getVersion() {
+    public UInt32 getVersion() {
         return version;
     }
 
