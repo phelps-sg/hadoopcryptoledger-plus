@@ -36,9 +36,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class reads Bitcoin blocks (in raw network format) from an input stream and returns Java objects of the class BitcoinBlock. It reuses code from the LineRecordReader due to its robustness and well-tested functionality.
+ * This class reads Bitcoin blocks (in raw network format) from an input stream and returns Java objects of the
+ * class BitcoinBlock. It reuses code from the LineRecordReader due to its robustness and well-tested functionality.
  **/
-
 public class BitcoinBlockReader {
 
     private static final Log LOG = LogFactory.getLog(BitcoinBlockReader.class.getName());
@@ -49,7 +49,6 @@ public class BitcoinBlockReader {
     private boolean filterSpecificMagic = false;
     private byte[][] specificMagicByteArray;
     private ByteBuffer preAllocatedDirectByteBuffer;
-
     private InputStream bin;
 
     /**
@@ -98,7 +97,9 @@ public class BitcoinBlockReader {
      * Seek for a valid block start according to the following algorithm:
      * (1) find the magic of the block
      * (2) Check that the block can be fully read and that block size is smaller than maximum block size
-     * This functionality is particularly useful for file processing in Big Data systems, such as Hadoop and Co where we work indepently on different filesplits and cannot expect that the Bitcoin block starts directly at the beginning of the stream;
+     * This functionality is particularly useful for file processing in Big Data systems,
+     * such as Hadoop and Co where we work indepently on different filesplits and cannot expect that the
+     * Bitcoin block starts directly at the beginning of the stream.
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
@@ -143,7 +144,6 @@ public class BitcoinBlockReader {
         return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
                                         hashMerkleRoot, transactions, auxPOW);
     }
-
 
     /**
      * Parses AuxPOW information (cf. https://en.bitcoin.it/wiki/Merged_mining_specification)
@@ -203,7 +203,6 @@ public class BitcoinBlockReader {
         byte[] parentBlockHashPrevBlock = new byte[32];
 
         // version
-
         int parentBlockVersion = rawByteBuffer.getInt();
         // hashPrevBlock
         rawByteBuffer.get(parentBlockHashPrevBlock, 0, 32);
@@ -275,6 +274,7 @@ public class BitcoinBlockReader {
                     currentInCounterVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
                     currentNoOfInputs = BitcoinUtil.getVarInt(currentInCounterVarInt);
                 } else {
+                    //TODO Exception?
                     LOG.warn("It seems a block with 0 transaction inputs was found");
                     rawByteBuffer.reset();
                 }
@@ -324,38 +324,35 @@ public class BitcoinBlockReader {
         return resultTransactions;
     }
 
-
     /**
      * Parses the Bitcoin transaction inputs in a byte buffer.
      *
-     * @param rawByteBuffer ByteBuffer from which the transaction inputs have to be parsed
-     * @param noOfTransactionInputs Number of expected transaction inputs
-     *
-     * @return Array of transactions
-     *
+     * @param buffer         ByteBuffer from which the transaction inputs are to be parsed.
+     * @param numInputs      Number of transaction inputs to parse.
+     * @return               List of parsed transaction inputs.
      */
-    public List<BitcoinTransactionInput> parseTransactionInputs(ByteBuffer rawByteBuffer, long noOfTransactionInputs) {
-        ArrayList<BitcoinTransactionInput> currentTransactionInput = new ArrayList<>((int) noOfTransactionInputs);
+    public List<BitcoinTransactionInput> parseTransactionInputs(ByteBuffer buffer, long numInputs) {
+        ArrayList<BitcoinTransactionInput> inputs = new ArrayList<>((int) numInputs);
+        for (int i = 0; i < numInputs; i++) {
 
-        for (int i = 0; i < noOfTransactionInputs; i++) {
-            // read previous Hash of Transaction
-            byte[] currentTransactionInputPrevTransactionHash = new byte[32];
-            rawByteBuffer.get(currentTransactionInputPrevTransactionHash, 0, 32);
-            // read previousTxOutIndex
-            long currentTransactionInputPrevTxOutIdx = BitcoinUtil.convertSignedIntToUnsigned(rawByteBuffer.getInt());
+            HashSHA256 prevTransactionHash = new HashSHA256(buffer);
+            UInt32 prevTxOutIdx = new UInt32(buffer);
+
             // read InScript length (Potential Internal Exceed Java Type)
-            byte[] currentTransactionTxInScriptLengthVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(rawByteBuffer);
-            long currentTransactionTxInScriptSize = BitcoinUtil.getVarInt(currentTransactionTxInScriptLengthVarInt);
+            byte[] inScriptLengthVarInt = BitcoinUtil.convertVarIntByteBufferToByteArray(buffer);
+            long txInScriptSize = BitcoinUtil.getVarInt(inScriptLengthVarInt);
+
             // read inScript
-            int currentTransactionTxInScriptSizeInt = (int) currentTransactionTxInScriptSize;
-            byte[] currentTransactionInScript = new byte[currentTransactionTxInScriptSizeInt];
-            rawByteBuffer.get(currentTransactionInScript, 0, currentTransactionTxInScriptSizeInt);
-            // read sequence no
-            long currentTransactionInputSeqNo = BitcoinUtil.convertSignedIntToUnsigned(rawByteBuffer.getInt());
-            // add input
-            currentTransactionInput.add(new BitcoinTransactionInput(currentTransactionInputPrevTransactionHash, currentTransactionInputPrevTxOutIdx, currentTransactionTxInScriptLengthVarInt, currentTransactionInScript, currentTransactionInputSeqNo));
+            int txInScriptSizeInt = (int) txInScriptSize;
+            byte[] inScript = new byte[txInScriptSizeInt];
+            buffer.get(inScript, 0, txInScriptSizeInt);
+
+            UInt32 seqNo = new UInt32(buffer);
+
+            inputs.add(new BitcoinTransactionInput(prevTransactionHash, prevTxOutIdx, inScriptLengthVarInt,
+                                                        inScript, seqNo));
         }
-        return currentTransactionInput;
+        return inputs;
     }
 
     /**
@@ -479,7 +476,6 @@ public class BitcoinBlockReader {
      *
      * @throws java.io.IOException in case of errors reading from the InputStream
      */
-
     public void close() throws IOException {
         this.bin.close();
     }
@@ -562,7 +558,6 @@ public class BitcoinBlockReader {
         this.bin.reset();
         // it is a full block
     }
-
 
     /**
      * Skips blocks in inputStream which are not specified in the magic filter
@@ -666,6 +661,4 @@ public class BitcoinBlockReader {
         }
         return false;
     }
-
-
 }

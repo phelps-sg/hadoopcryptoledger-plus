@@ -16,6 +16,7 @@
 
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
@@ -26,21 +27,21 @@ public class BitcoinTransactionInput implements Serializable, Byteable {
 
     private static final long serialVersionUID = 283893453089295979L;
 
-    private byte[] prevTransactionHash;
+    private HashSHA256 prevTransactionHash;
     private UInt32 previousTxOutIndex;
     private byte[] txInScriptLength;
     private byte[] txInScript;
     private UInt32 seqNo;
 
-    public BitcoinTransactionInput(byte[] prevTransactionHash, long previousTxOutIndex, byte[] txInScriptLength, byte[] txInScript, long seqNo) {
+    public BitcoinTransactionInput(HashSHA256 prevTransactionHash, UInt32 previousTxOutIndex, byte[] txInScriptLength, byte[] txInScript, UInt32 seqNo) {
         this.prevTransactionHash = prevTransactionHash;
-        this.previousTxOutIndex = new UInt32(previousTxOutIndex);
+        this.previousTxOutIndex = previousTxOutIndex;
         this.txInScriptLength = txInScriptLength;
         this.txInScript = txInScript;
-        this.seqNo = new UInt32(seqNo);
+        this.seqNo = seqNo;
     }
 
-    public byte[] getPrevTransactionHash() {
+    public HashSHA256 getPrevTransactionHash() {
         return this.prevTransactionHash;
     }
 
