@@ -106,4 +106,9 @@ public class UInt32 extends Number implements Byteable {
         return (double) getValue();
     }
 
+    @Override
+    public boolean equals(Object other) {
+        return ((Number) other).longValue() == this.longValue();
+    }
+
 }
