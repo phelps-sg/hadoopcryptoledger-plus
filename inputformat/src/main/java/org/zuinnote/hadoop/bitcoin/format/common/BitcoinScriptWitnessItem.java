@@ -15,6 +15,7 @@
  */
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
@@ -30,15 +31,15 @@ public class BitcoinScriptWitnessItem implements Serializable, Byteable {
      *
      */
     private static final long serialVersionUID = -8500521021303513414L;
-    private byte[] stackItemCounter;
+    private UIntVar stackItemCounter;
     private List<BitcoinScriptWitness> scriptWitnessList;
 
-    public BitcoinScriptWitnessItem(byte[] stackItemCounter, List<BitcoinScriptWitness> scriptWitnessList) {
+    public BitcoinScriptWitnessItem(UIntVar stackItemCounter, List<BitcoinScriptWitness> scriptWitnessList) {
         this.stackItemCounter = stackItemCounter;
         this.scriptWitnessList = scriptWitnessList;
     }
 
-    public byte[] getStackItemCounter() {
+    public UIntVar getStackItemCounter() {
         return this.stackItemCounter;
     }
 

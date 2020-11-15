@@ -15,6 +15,7 @@
  */
 package org.zuinnote.hadoop.bitcoin.format.common;
 
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
@@ -24,15 +25,15 @@ public class BitcoinScriptWitness implements Serializable, Byteable {
 
     private static final long serialVersionUID = 273511143914429994L;
 
-    private byte[] witnessScriptLength;
+    private UIntVar witnessScriptLength;
     private byte[] witnessScript;
 
-    public BitcoinScriptWitness(byte[] witnessScriptLength, byte[] witnessScript) {
+    public BitcoinScriptWitness(UIntVar witnessScriptLength, byte[] witnessScript) {
         this.witnessScriptLength = witnessScriptLength;
         this.witnessScript = witnessScript;
     }
 
-    public byte[] getWitnessScriptLength() {
+    public UIntVar getWitnessScriptLength() {
         return this.witnessScriptLength;
     }
 
