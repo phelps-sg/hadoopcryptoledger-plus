@@ -294,7 +294,6 @@ public class BitcoinBlockReader {
                 // for each transaction input there is at least some segwit data item
                 // read scriptWitness size
 
-
                 currentListOfTransactionSegwits = new ArrayList<>();
                 for (int i = 0; i < currentNoOfInputs; i++) {
                     // get no of witness items for input
@@ -326,7 +325,7 @@ public class BitcoinBlockReader {
     }
 
 
-    /*
+    /**
      * Parses the Bitcoin transaction inputs in a byte buffer.
      *
      * @param rawByteBuffer ByteBuffer from which the transaction inputs have to be parsed
@@ -359,11 +358,11 @@ public class BitcoinBlockReader {
         return currentTransactionInput;
     }
 
-    /*
+    /**
      * Parses the Bitcoin transaction outputs in a byte buffer.
      *
      * @param rawByteBuffer ByteBuffer from which the transaction outputs have to be parsed
-     * @param noOfTransactionInputs Number of expected transaction outputs
+     * @param noOfTransactionOutputs Number of expected transaction outputs
      *
      * @return Array of transactions
      *
@@ -388,7 +387,7 @@ public class BitcoinBlockReader {
         return currentTransactionOutput;
     }
 
-    /*
+    /**
      * Reads a raw Bitcoin block into a ByteBuffer. This method is recommended if you are only interested in a small part of the block and do not need the deserialization of the full block, ie in case you generally skip a lot of blocks
      *
      *
@@ -396,8 +395,6 @@ public class BitcoinBlockReader {
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
-
-
     public ByteBuffer readRawBlock() throws IOException {
         byte[] blockSizeByte = new byte[0];
         while (blockSizeByte.length == 0) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
@@ -487,14 +484,12 @@ public class BitcoinBlockReader {
         this.bin.close();
     }
 
-
-    /*
+    /**
      * Finds the start of a block by looking for the specified magics in the current InputStream
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors reading Blockchain data
      *
      */
-
     private void findMagic() throws IOException {
         // search if first byte of any magic matches
         // search up to maximum size of a bitcoin block
@@ -522,80 +517,54 @@ public class BitcoinBlockReader {
         }
     }
 
-    /*
+    /**
      * Checks if there is a full Bitcoin Block at the current position of the InputStream
      *
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors reading Blockchain data
      *
      */
-
-    private void checkFullBlock() throws BitcoinBlockReadException {
+    private void checkFullBlock() throws IOException {
         // now we can check that we have a full block
-        try {
-            this.bin.mark(this.maxSizeBitcoinBlock);
-            // skip maigc
-            long skipMagic = this.bin.skip(4);
-            if (skipMagic != 4) {
-                throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip forward magic");
-            }
-        } catch (IOException e) {
-            LOG.error(e);
-            throw new BitcoinBlockReadException(e.toString());
+        this.bin.mark(this.maxSizeBitcoinBlock);
+        // skip maigc
+        long skipMagic = this.bin.skip(4);
+        if (skipMagic != 4) {
+            throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip forward magic");
         }
-        // read size
-        // blocksize
         byte[] blockSizeArray = new byte[4];
-        try {
-
-            int maxByteRead = 4;
-            int totalByteRead = 0;
-            int readByte;
-            while ((readByte = this.bin.read(blockSizeArray, totalByteRead, maxByteRead - totalByteRead)) > -1) {
-                totalByteRead += readByte;
-                if (totalByteRead >= maxByteRead) {
-                    break;
-                }
+        int maxByteRead = 4;
+        int totalByteRead = 0;
+        int readByte;
+        while ((readByte = this.bin.read(blockSizeArray, totalByteRead, maxByteRead - totalByteRead)) > -1) {
+            totalByteRead += readByte;
+            if (totalByteRead >= maxByteRead) {
+                break;
             }
-            if (totalByteRead != maxByteRead) {
-                throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot read size of block");
-            }
-        } catch (IOException e) {
-            LOG.error(e);
-            throw new BitcoinBlockReadException(e.toString());
         }
-        long blockSize = BitcoinUtil.getSize(blockSizeArray);
+        if (totalByteRead != maxByteRead) {
+            throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot read size of block");
+        }
+        long blockSize = new UInt32(blockSizeArray).getValue();
         if (this.maxSizeBitcoinBlock < blockSize) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Max bitcoin block size is smaller than current block size.");
         }
         int blockSizeInt = (int) blockSize;
         byte[] blockRead = new byte[blockSizeInt];
-        int totalByteRead = 0;
-        int readByte;
-        try {
-            while ((readByte = this.bin.read(blockRead, totalByteRead, blockSizeInt - totalByteRead)) > -1) {
-                totalByteRead += readByte;
-                if (totalByteRead >= blockSize) {
-                    break;
-                }
+        while ((readByte = this.bin.read(blockRead, totalByteRead, blockSizeInt - totalByteRead)) > -1) {
+            totalByteRead += readByte;
+            if (totalByteRead >= blockSize) {
+                break;
             }
-        } catch (IOException e) {
-            LOG.error(e);
-            throw new BitcoinBlockReadException(e.toString());
         }
         if (totalByteRead != blockSize) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip to end of block");
         }
-        try {
-            this.bin.reset();
-        } catch (IOException e) {
-            LOG.error(e);
-            throw new BitcoinBlockReadException(e.toString());
-        }
+        this.bin.reset();
         // it is a full block
     }
 
 
-    /*
+    /**
      * Skips blocks in inputStream which are not specified in the magic filter
      *
      * @return null or byte array containing the size of the block (not the block itself)
@@ -665,7 +634,6 @@ public class BitcoinBlockReader {
      * @throws java.io.IOException in case of issues reading from BufferedInputStream
      * @retrun true if one of the magics has been identified, false if not
      */
-
     private boolean checkForMagicBytes(int firstByte) throws IOException {
         byte[] fullMagic = null;
         for (int i = 0; i < this.specificMagicByteArray.length; i++) {
@@ -689,7 +657,7 @@ public class BitcoinBlockReader {
                     }
                 }
                 // compare full magics
-                if (BitcoinUtil.compareMagics(fullMagic, this.specificMagicByteArray[i])) {
+                if (new Magic(fullMagic).equals(new Magic(specificMagicByteArray[i]))) {
                     this.bin.reset();
                     return true;
                 }
