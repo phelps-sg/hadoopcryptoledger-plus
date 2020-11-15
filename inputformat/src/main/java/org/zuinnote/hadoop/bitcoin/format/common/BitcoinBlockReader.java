@@ -657,7 +657,7 @@ public class BitcoinBlockReader {
                     }
                 }
                 // compare full magics
-                if (BitcoinUtil.compareMagics(fullMagic, this.specificMagicByteArray[i])) {
+                if (new Magic(fullMagic).equals(new Magic(specificMagicByteArray[i]))) {
                     this.bin.reset();
                     return true;
                 }
