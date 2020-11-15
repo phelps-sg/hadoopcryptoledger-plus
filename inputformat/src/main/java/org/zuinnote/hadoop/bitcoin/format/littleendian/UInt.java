@@ -23,11 +23,8 @@ import java.nio.ByteOrder;
 
 public abstract class UInt extends Number implements Byteable {
 
-//    public static final int NUM_BYTES = 4;
-//    public static final long MAX = (1L << (NUM_BYTES * 8)) - 1;
-
     /**
-     * The raw data stored as 4 bytes in little-endian order.
+     * The raw data stored in little-endian order.
      */
     protected ByteBuffer rawData;
 
@@ -73,6 +70,10 @@ public abstract class UInt extends Number implements Byteable {
         for (int i = 0; i < getNumBytes(); i++) {
             rawData.put(i, buffer.get());
         }
+    }
+
+    public long getMaxValue() {
+        return (1L << (getNumBytes() * 8)) - 1;
     }
 
     @Override

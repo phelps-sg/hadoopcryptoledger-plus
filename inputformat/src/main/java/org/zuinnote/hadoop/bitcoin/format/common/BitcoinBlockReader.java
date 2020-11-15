@@ -19,10 +19,7 @@ package org.zuinnote.hadoop.bitcoin.format.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.Magic;
-import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.*;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
 import java.io.BufferedInputStream;
@@ -134,12 +131,7 @@ public class BitcoinBlockReader {
         UInt32 bits = new UInt32(buffer);
         UInt32 nonce = new UInt32(buffer);
         BitcoinAuxPOW auxPOW = parseAuxPow(buffer);
-        long transactionCounter = BitcoinUtil.convertVarIntByteBufferToLong(buffer);
-
-        List<BitcoinTransaction> transactions = parseTransactions(buffer, transactionCounter);
-        if (transactions.size() != transactionCounter) {
-            throw new BitcoinBlockReadException("Error: Number of Transactions (" + transactions.size() + ") does not correspond to transaction counter in block (" + transactionCounter + ")");
-        }
+        List<BitcoinTransaction> transactions = parseTransactions(buffer);
 
         return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
                                         hashMerkleRoot, transactions, auxPOW);
@@ -247,7 +239,8 @@ public class BitcoinBlockReader {
      * @param noOfTransactions Number of expected transactions
      * @return Array of transactions
      */
-    public List<BitcoinTransaction> parseTransactions(ByteBuffer rawByteBuffer, long noOfTransactions) {
+    public List<BitcoinTransaction> parseTransactions(ByteBuffer rawByteBuffer) {
+        long noOfTransactions = new UIntVar(rawByteBuffer).longValue();
         ArrayList<BitcoinTransaction> resultTransactions = new ArrayList<>((int) noOfTransactions);
         // read all transactions from ByteBuffer
         for (int k = 0; k < noOfTransactions; k++) {
