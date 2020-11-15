@@ -16,6 +16,9 @@
 
 package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class Magic extends UInt32 {
@@ -39,6 +42,14 @@ public class Magic extends UInt32 {
 
     public Magic(ByteBuffer value) {
         super(value);
+    }
+
+    public Magic(DataInput input) throws IOException {
+        super(input);
+    }
+
+    public Magic(InputStream input) throws IOException {
+        super(input);
     }
 
     public Magic() {

@@ -18,6 +18,9 @@ package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -48,6 +51,17 @@ public abstract class UInt extends Number implements Byteable {
         setValue(value);
     }
 
+    public UInt(DataInput input) throws IOException {
+        this();
+        setValue(input);
+    }
+
+    public UInt(InputStream input) throws IOException {
+        this();
+        setValue(input);
+    }
+
+
     public abstract long getValue();
 
     public abstract int getNumBytes();
@@ -69,6 +83,26 @@ public abstract class UInt extends Number implements Byteable {
     public void setValue(ByteBuffer buffer) {
         for (int i = 0; i < getNumBytes(); i++) {
             rawData.put(i, buffer.get());
+        }
+    }
+
+    public void setValue(DataInput input) throws IOException  {
+        for (int i = 0; i < getNumBytes(); i++) {
+            input.readByte();
+        }
+    }
+
+    public void setValue(InputStream input) throws IOException {
+        int totalByteRead = 0;
+        int readByte = 0;
+        while ((readByte = input.read(rawData.array(), totalByteRead, getNumBytes() - totalByteRead)) > -1) {
+            totalByteRead += readByte;
+            if (totalByteRead >= getNumBytes()) {
+                break;
+            }
+        }
+        if (totalByteRead != getNumBytes()) {
+            //TODO?
         }
     }
 

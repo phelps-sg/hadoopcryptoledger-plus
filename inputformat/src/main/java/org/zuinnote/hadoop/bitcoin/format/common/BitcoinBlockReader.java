@@ -241,7 +241,7 @@ public class BitcoinBlockReader {
      */
     public List<BitcoinTransaction> parseTransactions(ByteBuffer buffer) {
         long noOfTransactions = new UIntVar(buffer).longValue();
-        ArrayList<BitcoinTransaction> resultTransactions = new ArrayList<>((int) noOfTransactions);
+        ArrayList<BitcoinTransaction> result = new ArrayList<>((int) noOfTransactions);
         for (int k = 0; k < noOfTransactions; k++) {
             UInt32 version = new UInt32(buffer);
             UIntVar inCounter = new UIntVar(buffer);
@@ -291,10 +291,10 @@ public class BitcoinBlockReader {
                 scriptWitnessItems = new ArrayList<>();
             }
             EpochDatetime lockTime = new EpochDatetime(buffer);
-            resultTransactions.add(new BitcoinTransaction(version, marker, flag, inCounter, outCounter,
+            result.add(new BitcoinTransaction(version, marker, flag, inCounter, outCounter,
                                                                 inputs, outputs, scriptWitnessItems, lockTime));
         }
-        return resultTransactions;
+        return result;
     }
 
     /**
@@ -360,16 +360,17 @@ public class BitcoinBlockReader {
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
     public ByteBuffer readRawBlock() throws IOException {
-        byte[] blockSizeByte = new byte[0];
-        while (blockSizeByte.length == 0) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
+//        byte[] blockSizeByte = new byte[0];
+        Long rawBlockSize = null;
+        while (rawBlockSize == null) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
             // check if more to read
             if (this.bin.available() < 1) {
                 return null;
             }
-            blockSizeByte = skipBlocksNotInFilter();
+            rawBlockSize = skipBlocksNotInFilter();
         }
         // check if it is larger than maxsize, include 8 bytes for the magic and size header
-        int blockSize = new UInt32(blockSizeByte).intValue() + 8;
+        int blockSize = rawBlockSize.intValue() + 8; // new UInt32(blockSizeByte).intValue() + 8;
         if (blockSize == 0) {
             throw new BitcoinBlockReadException("Error: Blocksize too small");
         }
@@ -527,65 +528,28 @@ public class BitcoinBlockReader {
     }
 
     /**
-     * Skips blocks in inputStream which are not specified in the magic filter
+     * Read the magic and blockSize fields in the header and return the raw block size as Long,
+     * or null iff filterSpecificMagic is true, and the magic read does not match any of those specified
+     * in specificMagicByteArray.
      *
-     * @return null or byte array containing the size of the block (not the block itself)
+     * @return null, or the raw size of the block excluding the magic and blockSize fields.
      *
      * @throws java.io.IOException in case of errors reading from InputStream
-     *
      */
-    private byte[] skipBlocksNotInFilter() throws IOException {
-//        byte[] magicNo = new byte[4];
-        Magic magicNo = new Magic(0);
-        byte[] blockSizeByte = new byte[4];
-        // mark bytestream so we can peak into it
+    private Long skipBlocksNotInFilter() throws IOException {
         this.bin.mark(8);
-        // read magic
-        int maxByteRead = 4;
-        int totalByteRead = 0;
-        int readByte;
-        while ((readByte = this.bin.read(magicNo.getBytes(), totalByteRead, maxByteRead - totalByteRead)) > -1) {
-            totalByteRead += readByte;
-            if (totalByteRead >= maxByteRead) {
-                break;
-            }
-        }
-        if (totalByteRead != maxByteRead) {
-            return new byte[0];
-        }
-
-        // read blocksize
-
-        maxByteRead = 4;
-        totalByteRead = 0;
-        while ((readByte = this.bin.read(blockSizeByte, totalByteRead, maxByteRead - totalByteRead)) > -1) {
-            totalByteRead += readByte;
-            if (totalByteRead >= maxByteRead) {
-                break;
-            }
-        }
-        if (totalByteRead != maxByteRead) {
-            return new byte[0];
-        }
-
-        long blockSize = new UInt32(blockSizeByte).getValue() + 8;
-        // read the full block
+        Magic magicNo = new Magic(bin);
+        UInt32 blockSize = new UInt32(bin);
         this.bin.reset();
-        //filter by magic numbers?
         if (filterSpecificMagic) {
             for (byte[] filter : specificMagicByteArray) {
                 if (new Magic(filter).equals(magicNo)) {
-                    return blockSizeByte;
+                    return blockSize.getValue();
                 }
             }
-            // Skip block if not found
-            if (this.bin.skip(blockSize) != blockSize) {
-                //TODO exception?
-                LOG.error("Cannot skip block in InputStream");
-            }
-            return new byte[0];
+            return null;
         } else {
-            return blockSizeByte;
+            return blockSize.getValue();
         }
     }
 
