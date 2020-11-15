@@ -28,87 +28,36 @@ import java.nio.ByteOrder;
  * to a 64-bit signed long on-demand.  This allows UINT32 values  to be stored efficiently
  * for big-data computations while retaining the full range of positive values.
  */
-public class UInt32 extends Number implements Byteable {
+public class UInt32 extends UInt {
 
     public static final int NUM_BYTES = 4;
     public static final long MAX = (1L << (NUM_BYTES * 8)) - 1;
 
-    /**
-     * The raw data stored as 4 bytes in little-endian order.
-     */
-    protected ByteBuffer rawData;
-
     public UInt32() {
-        this.rawData = ByteBuffer.allocate(NUM_BYTES);
-        this.rawData.order(ByteOrder.LITTLE_ENDIAN);
+        super();
     }
 
     public UInt32(byte[] value) {
-        this();
-        setValue(value);
+        super(value);
     }
 
     public UInt32(long value) {
-        this();
-        setValue(value);
+        super(value);
     }
 
     public UInt32(ByteBuffer value) {
-        this();
-        setValue(value);
+        super(value);
+    }
+
+    public int getNumBytes() {
+        return NUM_BYTES;
     }
 
     public long getValue() {
         return rawData.getInt(0) & MAX;
     }
 
-    public ByteBuffer getRawData() {
-        return rawData;
-    }
-
-    public byte[] getBytes() {
-        return getRawData().array();
-    }
-
     public void setValue(long value) {
         rawData.putInt(0, (int) value);
     }
-
-    public void setValue(byte[] value) {
-        rawData.put(value, 0, NUM_BYTES);
-    }
-
-    public void setValue(ByteBuffer buffer) {
-        for (int i = 0; i < NUM_BYTES; i++) {
-            rawData.put(i, buffer.get());
-        }
-    }
-
-    @Override
-    public int intValue() {
-        int result = (int) getValue();
-        if (result < 0) throw new IllegalArgumentException("signed int overflow");
-        return result;
-    }
-
-    @Override
-    public long longValue() {
-        return getValue();
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) getValue();
-    }
-
-    @Override
-    public double doubleValue() {
-        return (double) getValue();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return ((Number) other).longValue() == this.longValue();
-    }
-
 }
