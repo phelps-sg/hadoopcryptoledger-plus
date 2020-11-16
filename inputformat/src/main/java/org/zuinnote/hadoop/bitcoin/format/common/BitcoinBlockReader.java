@@ -479,32 +479,21 @@ public class BitcoinBlockReader {
         if (skipMagic != 4) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip forward magic");
         }
-        byte[] blockSizeArray = new byte[4];
-        int maxByteRead = 4;
-        int totalByteRead = 0;
-        int readByte;
-        while ((readByte = this.bin.read(blockSizeArray, totalByteRead, maxByteRead - totalByteRead)) > -1) {
-            totalByteRead += readByte;
-            if (totalByteRead >= maxByteRead) {
-                break;
-            }
-        }
-        if (totalByteRead != maxByteRead) {
-            throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot read size of block");
-        }
-        long blockSize = new UInt32(blockSizeArray).getValue();
-        if (this.maxSizeBitcoinBlock < blockSize) {
+
+        UInt32 blockSize = new UInt32(bin);
+        if (blockSize.getValue() > this.maxSizeBitcoinBlock) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Max bitcoin block size is smaller than current block size.");
         }
-        int blockSizeInt = (int) blockSize;
-        byte[] blockRead = new byte[blockSizeInt];
-        while ((readByte = this.bin.read(blockRead, totalByteRead, blockSizeInt - totalByteRead)) > -1) {
+
+        int readByte, totalByteRead = 0;
+        byte[] blockRead = new byte[blockSize.intValue()];
+        while ((readByte = this.bin.read(blockRead, totalByteRead, blockSize.intValue() - totalByteRead)) > -1) {
             totalByteRead += readByte;
-            if (totalByteRead >= blockSize) {
+            if (totalByteRead >= blockSize.intValue()) {
                 break;
             }
         }
-        if (totalByteRead != blockSize) {
+        if (totalByteRead != blockSize.intValue()) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip to end of block");
         }
         this.bin.reset();
