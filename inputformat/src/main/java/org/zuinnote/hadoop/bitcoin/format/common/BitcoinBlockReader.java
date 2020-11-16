@@ -326,26 +326,26 @@ public class BitcoinBlockReader {
     /**
      * Parses the Bitcoin transaction outputs in a byte buffer.
      *
-     * @param rawByteBuffer ByteBuffer from which the transaction outputs have to be parsed
-     * @param noOfTransactionOutputs Number of expected transaction outputs
+     * @param buffer ByteBuffer from which the transaction outputs have to be parsed
+     * @param numOutputs Number of expected transaction outputs
      *
      * @return Array of transactions
      *
      */
-    public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer rawByteBuffer, long noOfTransactionOutputs) {
+    public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer buffer, long numOutputs) {
 
-        ArrayList<BitcoinTransactionOutput> outputs = new ArrayList<>((int) (noOfTransactionOutputs));
-        for (int i = 0; i < noOfTransactionOutputs; i++) {
+        ArrayList<BitcoinTransactionOutput> outputs = new ArrayList<>((int) (numOutputs));
+        for (int i = 0; i < numOutputs; i++) {
 
             // read value
             byte[] currentTransactionOutputValueArray = new byte[8];
-            rawByteBuffer.get(currentTransactionOutputValueArray);
-            BigInteger currentTransactionOutputValue =
+            buffer.get(currentTransactionOutputValueArray);
+            BigInteger value =
                     new BigInteger(1, BitcoinUtil.reverseByteArray(currentTransactionOutputValueArray));
 
-            BitcoinScript outScript = new BitcoinScript(rawByteBuffer);
+            BitcoinScript outScript = new BitcoinScript(buffer);
 
-            outputs.add(new BitcoinTransactionOutput(currentTransactionOutputValue, outScript));
+            outputs.add(new BitcoinTransactionOutput(value, outScript));
         }
 
         return outputs;
