@@ -32,16 +32,16 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     private static final long serialVersionUID = 2854570630540937753L;
 
     private BigInteger value;
-    private UIntVar txOutScriptLength;
-    private byte[] txOutScript;
+    private BitcoinScript outScript;
 
     //TODO Configure from magic?
     protected static NetworkParameters networkParameters = MainNetParams.get();
 
-    public BitcoinTransactionOutput(BigInteger value, UIntVar txOutScriptLength, byte[] txOutScript) {
+    public BitcoinTransactionOutput(BigInteger value, BitcoinScript outScript) { //UIntVar txOutScriptLength, byte[] txOutScript) {
         this.value = value;
-        this.txOutScriptLength = txOutScriptLength;
-        this.txOutScript = txOutScript;
+        this.outScript = outScript;
+//        this.txOutScriptLength = txOutScriptLength;
+//        this.txOutScript = txOutScript;
     }
 
     public BigInteger getValue() {
@@ -49,15 +49,15 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     }
 
     public UIntVar getTxOutScriptLength() {
-        return this.txOutScriptLength;
+        return getTxOutScriptLength();
     }
 
     public byte[] getTxOutScript() {
-        return this.txOutScript;
+        return this.outScript.getScript().getBytes();
     }
 
     public Address getToAddress(NetworkParameters params) {
-        Script script = new Script(txOutScript);
+        Script script = new Script(outScript.getScript().getBytes());
         return script.getToAddress(params);
     }
 
@@ -72,7 +72,7 @@ public class BitcoinTransactionOutput implements Serializable, Byteable {
     @Override
     public byte[] getBytes() {
         return new Bytes(BitcoinUtil.convertBigIntegerToByteArray(getValue(), 8),
-                                txOutScriptLength, txOutScript).getBytes();
+                                outScript).getBytes();
     }
 
 }

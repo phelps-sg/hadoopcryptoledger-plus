@@ -334,22 +334,21 @@ public class BitcoinBlockReader {
      */
     public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer rawByteBuffer, long noOfTransactionOutputs) {
 
-        ArrayList<BitcoinTransactionOutput> currentTransactionOutput = new ArrayList<>((int) (noOfTransactionOutputs));
+        ArrayList<BitcoinTransactionOutput> outputs = new ArrayList<>((int) (noOfTransactionOutputs));
         for (int i = 0; i < noOfTransactionOutputs; i++) {
 
             // read value
             byte[] currentTransactionOutputValueArray = new byte[8];
             rawByteBuffer.get(currentTransactionOutputValueArray);
-            BigInteger currentTransactionOutputValue = new BigInteger(1, EthereumUtil.reverseByteArray(currentTransactionOutputValueArray));
+            BigInteger currentTransactionOutputValue =
+                    new BigInteger(1, BitcoinUtil.reverseByteArray(currentTransactionOutputValueArray));
 
-            // read outScript
-            UIntVar txOutScriptLength = new UIntVar(rawByteBuffer);
-            byte[] currentTransactionOutScript = new byte[txOutScriptLength.intValue()];
-            rawByteBuffer.get(currentTransactionOutScript, 0, txOutScriptLength.intValue());
-            currentTransactionOutput.add(new BitcoinTransactionOutput(currentTransactionOutputValue, txOutScriptLength, currentTransactionOutScript));
+            BitcoinScript outScript = new BitcoinScript(rawByteBuffer);
+
+            outputs.add(new BitcoinTransactionOutput(currentTransactionOutputValue, outScript));
         }
 
-        return currentTransactionOutput;
+        return outputs;
     }
 
     /**
