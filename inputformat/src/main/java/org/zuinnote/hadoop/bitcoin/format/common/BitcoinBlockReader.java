@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.*;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
 import java.io.BufferedInputStream;
@@ -360,7 +361,6 @@ public class BitcoinBlockReader {
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
     public ByteBuffer readRawBlock() throws IOException {
-//        byte[] blockSizeByte = new byte[0];
         Long rawBlockSize = null;
         while (rawBlockSize == null) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
             // check if more to read
@@ -369,17 +369,12 @@ public class BitcoinBlockReader {
             }
             rawBlockSize = skipBlocksNotInFilter();
         }
-        // check if it is larger than maxsize, include 8 bytes for the magic and size header
-        int blockSize = rawBlockSize.intValue() + 8; // new UInt32(blockSizeByte).intValue() + 8;
-        if (blockSize == 0) {
-            throw new BitcoinBlockReadException("Error: Blocksize too small");
-        }
-        if (blockSize < 0) {
-            throw new BitcoinBlockReadException("Error: This block size cannot be handled currently (larger then largest number in positive signed int)");
-        }
+        int blockSize = rawBlockSize.intValue() + 8;
+        assert blockSize > 0;
         if (blockSize > this.maxSizeBitcoinBlock) {
             throw new BitcoinBlockReadException("Error: Block size is larger then defined in configuration - Please increase it if this is a valid block");
         }
+
         // read full block into ByteBuffer
         byte[] fullBlock = new byte[blockSize];
         int totalByteRead = 0;
@@ -393,6 +388,7 @@ public class BitcoinBlockReader {
         if (totalByteRead != blockSize) {
             throw new BitcoinBlockReadException("Error: Could not read full block");
         }
+
         ByteBuffer result;
         if (!(this.useDirectBuffer)) {
             result = ByteBuffer.wrap(fullBlock);
@@ -415,28 +411,16 @@ public class BitcoinBlockReader {
      */
     public byte[] getKeyFromRawBlock(ByteBuffer rawByteBuffer) {
         rawByteBuffer.mark();
-        byte[] magicNo = new byte[4];
-        byte[] hashMerkleRoot = new byte[32];
-        byte[] hashPrevBlock = new byte[32];
-        // magic no (skip)
-        rawByteBuffer.get(magicNo, 0, 4);
-        // blocksize (skip)
+
+        Magic magicNo = new Magic(rawByteBuffer);
         rawByteBuffer.getInt();
-        // version (skip)
         rawByteBuffer.getInt();
-        // hashPrevBlock
-        rawByteBuffer.get(hashPrevBlock, 0, 32);
-        // hashMerkleRoot
-        rawByteBuffer.get(hashMerkleRoot, 0, 32);
-        byte[] result = new byte[hashMerkleRoot.length + hashPrevBlock.length];
-        for (int i = 0; i < hashMerkleRoot.length; i++) {
-            result[i] = hashMerkleRoot[i];
-        }
-        for (int j = 0; j < hashPrevBlock.length; j++) {
-            result[j + hashMerkleRoot.length] = hashPrevBlock[j];
-        }
+        HashSHA256 hashPrevBlock = new HashSHA256(rawByteBuffer);
+        HashSHA256 hashMerkleRoot = new HashSHA256(rawByteBuffer);
+
         rawByteBuffer.reset();
-        return result;
+
+        return new Bytes(hashMerkleRoot, hashPrevBlock).getBytes();
     }
 
     /**
