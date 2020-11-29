@@ -113,16 +113,14 @@ public class BitcoinBlockReader {
     /**
      * Read a block into a Java object of the class Bitcoin Block. This makes analysis very easy, but might be slower for some type of analytics where you are only interested in small parts of the block. In this case it is recommended to use {@link #readRawBlock}
      *
-     * @return BitcoinBlock
-     * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors of reading the Bitcoin Blockchain data
+     * @return an instance of BitcoinBlock if another block is available, otherwise null.
+     * @throws java.io.IOException in case of errors of reading the Bitcoin Blockchain data
      */
     public BitcoinBlock readBlock() throws IOException {
-
         ByteBuffer buffer = readRawBlock();
         if (buffer == null) {
             return null;
         }
-
         Magic magicNo = new Magic(buffer);
         UInt32 blockSize = new UInt32(buffer);
         UInt32 version = new UInt32(buffer);
@@ -133,7 +131,6 @@ public class BitcoinBlockReader {
         UInt32 nonce = new UInt32(buffer);
         BitcoinAuxPOW auxPOW = parseAuxPow(buffer);
         List<BitcoinTransaction> transactions = parseTransactions(buffer);
-
         return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
                                         hashMerkleRoot, transactions, auxPOW);
     }
