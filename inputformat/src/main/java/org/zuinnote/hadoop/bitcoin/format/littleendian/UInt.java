@@ -18,13 +18,11 @@ package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public abstract class UInt extends Number implements Byteable {
+public abstract class UInt extends Number implements Byteable, Serializable {
 
     /**
      * The raw data stored in little-endian order.
@@ -60,7 +58,6 @@ public abstract class UInt extends Number implements Byteable {
         this();
         setValue(input);
     }
-
 
     public abstract long getValue();
 
@@ -137,4 +134,14 @@ public abstract class UInt extends Number implements Byteable {
         return ((Number) other).longValue() == this.longValue();
     }
 
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.write(rawData.array());
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.read(rawData.array());
+    }
+
+    private void readObjectNoData() throws ObjectStreamException {
+    }
 }

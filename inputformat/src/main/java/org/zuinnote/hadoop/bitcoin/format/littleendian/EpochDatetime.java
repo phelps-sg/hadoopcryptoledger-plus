@@ -16,13 +16,14 @@
 
 package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
 /**
  * A date time stamp stored as a little-endian unsigned 32-bit integer epoch time.
  */
-public class EpochDatetime extends UInt32 {
+public class EpochDatetime extends UInt32 implements Serializable {
 
     public EpochDatetime(ByteBuffer rawByteBuffer) {
         super(rawByteBuffer);

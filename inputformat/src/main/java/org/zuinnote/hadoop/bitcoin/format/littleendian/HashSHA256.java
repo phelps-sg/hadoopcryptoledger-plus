@@ -20,9 +20,10 @@ import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public class HashSHA256 implements Byteable {
+public class HashSHA256 implements Byteable, Serializable {
 
     public static final int NUM_BYTES = 32;
 

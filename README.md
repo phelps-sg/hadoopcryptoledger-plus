@@ -25,7 +25,7 @@ cleaner API adhering to object-oriented design principles; in particular:
 <dependency>
   <groupId>com.mesonomics</groupId>
   <artifactId>hadoopcryptoledger-plus-fileformat</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
 </dependency>
 ~~~
 
