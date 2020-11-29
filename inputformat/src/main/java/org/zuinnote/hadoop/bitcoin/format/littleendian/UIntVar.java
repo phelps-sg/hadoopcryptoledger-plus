@@ -16,6 +16,7 @@
 
 package org.zuinnote.hadoop.bitcoin.format.littleendian;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -24,7 +25,7 @@ import java.nio.ByteOrder;
  * on the magnitude being represented.
  * See <a href="https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer">the protocol documentation</a>.
  */
-public class UIntVar extends UInt {
+public class UIntVar extends UInt implements Serializable {
 
     /**
      * The total number of bytes used to store the integer (excluding the header byte).
@@ -108,7 +109,6 @@ public class UIntVar extends UInt {
             case 2: result = rawData.getShort(1); break;
             case 4: result = rawData.getInt(1); break;
             case 8: result = rawData.getLong(1); break;
-
         }
         return result & getMaxValue();
     }

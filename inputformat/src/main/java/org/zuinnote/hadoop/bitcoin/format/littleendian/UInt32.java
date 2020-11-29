@@ -21,6 +21,7 @@ import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -31,7 +32,7 @@ import java.nio.ByteOrder;
  * to a 64-bit signed long on-demand.  This allows UINT32 values  to be stored efficiently
  * for big-data computations while retaining the full range of positive values.
  */
-public class UInt32 extends UInt {
+public class UInt32 extends UInt implements Serializable {
 
     public static final int NUM_BYTES = 4;
     public static final long MAX = (1L << (NUM_BYTES * 8)) - 1;

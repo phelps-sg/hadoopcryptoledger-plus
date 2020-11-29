@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.*;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 import org.zuinnote.hadoop.ethereum.format.common.EthereumUtil;
 
 import java.io.BufferedInputStream;
@@ -112,16 +113,14 @@ public class BitcoinBlockReader {
     /**
      * Read a block into a Java object of the class Bitcoin Block. This makes analysis very easy, but might be slower for some type of analytics where you are only interested in small parts of the block. In this case it is recommended to use {@link #readRawBlock}
      *
-     * @return BitcoinBlock
-     * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of errors of reading the Bitcoin Blockchain data
+     * @return an instance of BitcoinBlock if another block is available, otherwise null.
+     * @throws java.io.IOException in case of errors of reading the Bitcoin Blockchain data
      */
     public BitcoinBlock readBlock() throws IOException {
-
         ByteBuffer buffer = readRawBlock();
         if (buffer == null) {
             return null;
         }
-
         Magic magicNo = new Magic(buffer);
         UInt32 blockSize = new UInt32(buffer);
         UInt32 version = new UInt32(buffer);
@@ -132,7 +131,6 @@ public class BitcoinBlockReader {
         UInt32 nonce = new UInt32(buffer);
         BitcoinAuxPOW auxPOW = parseAuxPow(buffer);
         List<BitcoinTransaction> transactions = parseTransactions(buffer);
-
         return new BitcoinBlock(blockSize, magicNo, version, time, bits, nonce, hashPrevBlock,
                                         hashMerkleRoot, transactions, auxPOW);
     }
@@ -325,30 +323,29 @@ public class BitcoinBlockReader {
     /**
      * Parses the Bitcoin transaction outputs in a byte buffer.
      *
-     * @param rawByteBuffer ByteBuffer from which the transaction outputs have to be parsed
-     * @param noOfTransactionOutputs Number of expected transaction outputs
+     * @param buffer ByteBuffer from which the transaction outputs have to be parsed
+     * @param numOutputs Number of expected transaction outputs
      *
      * @return Array of transactions
      *
      */
-    public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer rawByteBuffer, long noOfTransactionOutputs) {
+    public List<BitcoinTransactionOutput> parseTransactionOutputs(ByteBuffer buffer, long numOutputs) {
 
-        ArrayList<BitcoinTransactionOutput> currentTransactionOutput = new ArrayList<>((int) (noOfTransactionOutputs));
-        for (int i = 0; i < noOfTransactionOutputs; i++) {
+        ArrayList<BitcoinTransactionOutput> outputs = new ArrayList<>((int) (numOutputs));
+        for (int i = 0; i < numOutputs; i++) {
 
             // read value
             byte[] currentTransactionOutputValueArray = new byte[8];
-            rawByteBuffer.get(currentTransactionOutputValueArray);
-            BigInteger currentTransactionOutputValue = new BigInteger(1, EthereumUtil.reverseByteArray(currentTransactionOutputValueArray));
+            buffer.get(currentTransactionOutputValueArray);
+            BigInteger value =
+                    new BigInteger(1, BitcoinUtil.reverseByteArray(currentTransactionOutputValueArray));
 
-            // read outScript
-            UIntVar txOutScriptLength = new UIntVar(rawByteBuffer);
-            byte[] currentTransactionOutScript = new byte[txOutScriptLength.intValue()];
-            rawByteBuffer.get(currentTransactionOutScript, 0, txOutScriptLength.intValue());
-            currentTransactionOutput.add(new BitcoinTransactionOutput(currentTransactionOutputValue, txOutScriptLength, currentTransactionOutScript));
+            BitcoinScript outScript = new BitcoinScript(buffer);
+
+            outputs.add(new BitcoinTransactionOutput(value, outScript));
         }
 
-        return currentTransactionOutput;
+        return outputs;
     }
 
     /**
@@ -360,7 +357,6 @@ public class BitcoinBlockReader {
      * @throws org.zuinnote.hadoop.bitcoin.format.exception.BitcoinBlockReadException in case of format errors of the Bitcoin Blockchain data
      **/
     public ByteBuffer readRawBlock() throws IOException {
-//        byte[] blockSizeByte = new byte[0];
         Long rawBlockSize = null;
         while (rawBlockSize == null) { // in case of filtering by magic no we skip blocks until we reach a valid magicNo or end of Block
             // check if more to read
@@ -369,17 +365,12 @@ public class BitcoinBlockReader {
             }
             rawBlockSize = skipBlocksNotInFilter();
         }
-        // check if it is larger than maxsize, include 8 bytes for the magic and size header
-        int blockSize = rawBlockSize.intValue() + 8; // new UInt32(blockSizeByte).intValue() + 8;
-        if (blockSize == 0) {
-            throw new BitcoinBlockReadException("Error: Blocksize too small");
-        }
-        if (blockSize < 0) {
-            throw new BitcoinBlockReadException("Error: This block size cannot be handled currently (larger then largest number in positive signed int)");
-        }
+        int blockSize = rawBlockSize.intValue() + 8;
+        assert blockSize > 0;
         if (blockSize > this.maxSizeBitcoinBlock) {
             throw new BitcoinBlockReadException("Error: Block size is larger then defined in configuration - Please increase it if this is a valid block");
         }
+
         // read full block into ByteBuffer
         byte[] fullBlock = new byte[blockSize];
         int totalByteRead = 0;
@@ -393,6 +384,7 @@ public class BitcoinBlockReader {
         if (totalByteRead != blockSize) {
             throw new BitcoinBlockReadException("Error: Could not read full block");
         }
+
         ByteBuffer result;
         if (!(this.useDirectBuffer)) {
             result = ByteBuffer.wrap(fullBlock);
@@ -415,28 +407,16 @@ public class BitcoinBlockReader {
      */
     public byte[] getKeyFromRawBlock(ByteBuffer rawByteBuffer) {
         rawByteBuffer.mark();
-        byte[] magicNo = new byte[4];
-        byte[] hashMerkleRoot = new byte[32];
-        byte[] hashPrevBlock = new byte[32];
-        // magic no (skip)
-        rawByteBuffer.get(magicNo, 0, 4);
-        // blocksize (skip)
+
+        Magic magicNo = new Magic(rawByteBuffer);
         rawByteBuffer.getInt();
-        // version (skip)
         rawByteBuffer.getInt();
-        // hashPrevBlock
-        rawByteBuffer.get(hashPrevBlock, 0, 32);
-        // hashMerkleRoot
-        rawByteBuffer.get(hashMerkleRoot, 0, 32);
-        byte[] result = new byte[hashMerkleRoot.length + hashPrevBlock.length];
-        for (int i = 0; i < hashMerkleRoot.length; i++) {
-            result[i] = hashMerkleRoot[i];
-        }
-        for (int j = 0; j < hashPrevBlock.length; j++) {
-            result[j + hashMerkleRoot.length] = hashPrevBlock[j];
-        }
+        HashSHA256 hashPrevBlock = new HashSHA256(rawByteBuffer);
+        HashSHA256 hashMerkleRoot = new HashSHA256(rawByteBuffer);
+
         rawByteBuffer.reset();
-        return result;
+
+        return new Bytes(hashMerkleRoot, hashPrevBlock).getBytes();
     }
 
     /**
@@ -495,32 +475,21 @@ public class BitcoinBlockReader {
         if (skipMagic != 4) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip forward magic");
         }
-        byte[] blockSizeArray = new byte[4];
-        int maxByteRead = 4;
-        int totalByteRead = 0;
-        int readByte;
-        while ((readByte = this.bin.read(blockSizeArray, totalByteRead, maxByteRead - totalByteRead)) > -1) {
-            totalByteRead += readByte;
-            if (totalByteRead >= maxByteRead) {
-                break;
-            }
-        }
-        if (totalByteRead != maxByteRead) {
-            throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot read size of block");
-        }
-        long blockSize = new UInt32(blockSizeArray).getValue();
-        if (this.maxSizeBitcoinBlock < blockSize) {
+
+        UInt32 blockSize = new UInt32(bin);
+        if (blockSize.getValue() > this.maxSizeBitcoinBlock) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Max bitcoin block size is smaller than current block size.");
         }
-        int blockSizeInt = (int) blockSize;
-        byte[] blockRead = new byte[blockSizeInt];
-        while ((readByte = this.bin.read(blockRead, totalByteRead, blockSizeInt - totalByteRead)) > -1) {
+
+        int readByte, totalByteRead = 0;
+        byte[] blockRead = new byte[blockSize.intValue()];
+        while ((readByte = this.bin.read(blockRead, totalByteRead, blockSize.intValue() - totalByteRead)) > -1) {
             totalByteRead += readByte;
-            if (totalByteRead >= blockSize) {
+            if (totalByteRead >= blockSize.intValue()) {
                 break;
             }
         }
-        if (totalByteRead != blockSize) {
+        if (totalByteRead != blockSize.intValue()) {
             throw new BitcoinBlockReadException("Error: Cannot seek to a block start, because no valid block found. Cannot skip to end of block");
         }
         this.bin.reset();

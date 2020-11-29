@@ -19,9 +19,10 @@ package org.zuinnote.hadoop.bitcoin.format.littleendian;
 import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public class Magic extends UInt32 {
+public class Magic extends UInt32 implements Serializable {
 
     public static final Magic DEFAULT =
             new Magic(new byte[]{(byte) 0xF9, (byte) 0xBE, (byte) 0xB4, (byte) 0xD9});

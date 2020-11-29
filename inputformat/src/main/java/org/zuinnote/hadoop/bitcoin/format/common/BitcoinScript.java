@@ -14,47 +14,48 @@
  *   limitations under the License.
  */
 
-package org.zuinnote.hadoop.bitcoin.format.littleendian;
+package org.zuinnote.hadoop.bitcoin.format.common;
 
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil;
+import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
 import org.zuinnote.hadoop.bitcoin.format.util.Byteable;
 import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public class HashSHA256 implements Byteable, Serializable {
+public class BitcoinScript implements Byteable {
 
-    public static final int NUM_BYTES = 32;
+    private UIntVar length;
+    private Bytes script;
 
-    protected byte[] rawData;
-
-    public HashSHA256(Bytes input) {
-        this.rawData = input.hashTwice();
+    public BitcoinScript(ByteBuffer input) {
+        length = new UIntVar(input);
+        byte[] scriptBytes = new byte[length.intValue()];
+        input.get(scriptBytes, 0, length.intValue());
+        script = new Bytes(scriptBytes);
     }
 
-    public HashSHA256(ByteBuffer buffer) {
-        rawData = new byte[NUM_BYTES];
-        setValue(buffer);
+    public BitcoinScript() {
     }
 
-    public HashSHA256(byte[] rawData) {
-        this.rawData = rawData;
-        assert rawData.length == 32;
+    public Bytes getScript() {
+        return script;
     }
 
-    public void setValue(ByteBuffer buffer) {
-        for (int i = 0; i < NUM_BYTES; i++) {
-            rawData[i] = buffer.get();
-        }
+    public long getLength() {
+        return length.longValue();
     }
 
-    public String toString() {
-        return BitcoinUtil.convertByteArrayToHexString(BitcoinUtil.reverseByteArray(rawData));
+    public void setLength(UIntVar length) {
+        this.length = length;
+    }
+
+    public void setScript(Bytes script) {
+        this.script = script;
     }
 
     @Override
     public byte[] getBytes() {
-        return rawData;
+        return new Bytes(length, script).getBytes();
     }
+
 }

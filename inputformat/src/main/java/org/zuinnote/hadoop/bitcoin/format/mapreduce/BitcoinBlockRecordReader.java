@@ -60,7 +60,6 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
         return this.currentValue;
     }
 
-
     /**
      * Read a next block.
      *
@@ -68,33 +67,18 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
      */
     @Override
     public boolean nextKeyValue() throws IOException {
-        // read all the blocks, if necessary a block overlapping a split
-        while (getFilePosition() <= getEnd()) { // did we already went beyond the split (remote) or do we have no further data left?
-            BitcoinBlock dataBlock = null;
-//            try {
-                dataBlock = getBbr().readBlock();
-
-//            } catch (BitcoinBlockReadException e) {
-                // log
-//                LOG.error(e);
-//            }
-            if (dataBlock == null) {
-                return false;
-            }
-            byte[] hashMerkleRoot = dataBlock.getHashMerkleRoot().getBytes();
-            byte[] hashPrevBlock = dataBlock.getHashPrevBlock().getBytes();
-            byte[] newKey = new byte[hashMerkleRoot.length + hashPrevBlock.length];
-            for (int i = 0; i < hashMerkleRoot.length; i++) {
-                newKey[i] = hashMerkleRoot[i];
-            }
-            for (int j = 0; j < hashPrevBlock.length; j++) {
-                newKey[j + hashMerkleRoot.length] = hashPrevBlock[j];
-            }
-            this.currentKey.set(newKey, 0, newKey.length);
-            this.currentValue.set(dataBlock);
-            return true;
+        BitcoinBlock block = getBbr().readBlock();
+        if (block == null) {
+            return false;
         }
-        return false;
+        byte[] hashMerkleRoot = block.getHashMerkleRoot().getBytes();
+        byte[] hashPrevBlock = block.getHashPrevBlock().getBytes();
+        byte[] newKey = new byte[hashMerkleRoot.length + hashPrevBlock.length];
+        System.arraycopy(hashMerkleRoot, 0, newKey, 0, hashMerkleRoot.length);
+        System.arraycopy(hashPrevBlock, 0, newKey, 0 + hashMerkleRoot.length, hashPrevBlock.length);
+        currentKey.set(newKey, 0, newKey.length);
+        currentValue.set(block);
+        return true;
     }
 
 }

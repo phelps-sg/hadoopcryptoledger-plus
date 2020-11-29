@@ -21,6 +21,7 @@ import org.zuinnote.hadoop.bitcoin.format.littleendian.EpochDatetime;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.HashSHA256;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UInt32;
 import org.zuinnote.hadoop.bitcoin.format.littleendian.UIntVar;
+import org.zuinnote.hadoop.bitcoin.format.util.Bytes;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -44,12 +45,14 @@ public class BitcoinTransactionTest {
         UIntVar outCounter = new UIntVar(1);
         long value = 5000000000L;
         UIntVar txOutScriptLength = new UIntVar(new byte[]{(byte) 0x43});
-        byte[] txOutScript = new byte[]{(byte) 0x41, (byte) 0x04, (byte) 0x67, (byte) 0x8A, (byte) 0xFD, (byte) 0xB0, (byte) 0xFE, (byte) 0x55, (byte) 0x48, (byte) 0x27, (byte) 0x19, (byte) 0x67, (byte) 0xF1, (byte) 0xA6, (byte) 0x71, (byte) 0x30, (byte) 0xB7, (byte) 0x10, (byte) 0x5C, (byte) 0xD6, (byte) 0xA8, (byte) 0x28, (byte) 0xE0, (byte) 0x39, (byte) 0x09, (byte) 0xA6, (byte) 0x79, (byte) 0x62, (byte) 0xE0, (byte) 0xEA, (byte) 0x1F, (byte) 0x61, (byte) 0xDE, (byte) 0xB6, (byte) 0x49, (byte) 0xF6, (byte) 0xBC, (byte) 0x3F, (byte) 0x4C, (byte) 0xEF, (byte) 0x38, (byte) 0xC4, (byte) 0xF3, (byte) 0x55, (byte) 0x04, (byte) 0xE5, (byte) 0x1E, (byte) 0xC1, (byte) 0x12, (byte) 0xDE, (byte) 0x5C, (byte) 0x38, (byte) 0x4D, (byte) 0xF7, (byte) 0xBA, (byte) 0x0B, (byte) 0x8D, (byte) 0x57, (byte) 0x8A, (byte) 0x4C, (byte) 0x70, (byte) 0x2B, (byte) 0x6B, (byte) 0xF1, (byte) 0x1D, (byte) 0x5F, (byte) 0xAC};
+        BitcoinScript txOut = new BitcoinScript();
+        txOut.setLength(txOutScriptLength);
+        txOut.setScript(new Bytes(new byte[]{(byte) 0x41, (byte) 0x04, (byte) 0x67, (byte) 0x8A, (byte) 0xFD, (byte) 0xB0, (byte) 0xFE, (byte) 0x55, (byte) 0x48, (byte) 0x27, (byte) 0x19, (byte) 0x67, (byte) 0xF1, (byte) 0xA6, (byte) 0x71, (byte) 0x30, (byte) 0xB7, (byte) 0x10, (byte) 0x5C, (byte) 0xD6, (byte) 0xA8, (byte) 0x28, (byte) 0xE0, (byte) 0x39, (byte) 0x09, (byte) 0xA6, (byte) 0x79, (byte) 0x62, (byte) 0xE0, (byte) 0xEA, (byte) 0x1F, (byte) 0x61, (byte) 0xDE, (byte) 0xB6, (byte) 0x49, (byte) 0xF6, (byte) 0xBC, (byte) 0x3F, (byte) 0x4C, (byte) 0xEF, (byte) 0x38, (byte) 0xC4, (byte) 0xF3, (byte) 0x55, (byte) 0x04, (byte) 0xE5, (byte) 0x1E, (byte) 0xC1, (byte) 0x12, (byte) 0xDE, (byte) 0x5C, (byte) 0x38, (byte) 0x4D, (byte) 0xF7, (byte) 0xBA, (byte) 0x0B, (byte) 0x8D, (byte) 0x57, (byte) 0x8A, (byte) 0x4C, (byte) 0x70, (byte) 0x2B, (byte) 0x6B, (byte) 0xF1, (byte) 0x1D, (byte) 0x5F, (byte) 0xAC}));
         EpochDatetime lockTime = new EpochDatetime(0);
         List<BitcoinTransactionInput> genesisInput = new ArrayList<BitcoinTransactionInput>(1);
         genesisInput.add(new BitcoinTransactionInput(previousTransactionHash, previousTxOutIndex, txInScriptLength, txInScript, seqNo));
         List<BitcoinTransactionOutput> genesisOutput = new ArrayList<BitcoinTransactionOutput>(1);
-        genesisOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value), txOutScriptLength, txOutScript));
+        genesisOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value), txOut));
 //        BitcoinTransaction genesisTransaction = new BitcoinTransaction(version, inCounter, genesisInput, outCounter, genesisOutput, lockTime);
         BitcoinTransaction genesisTransaction = new BitcoinTransaction(version, inCounter, outCounter, genesisInput, genesisOutput, null, lockTime);
         byte[] genesisTransactionHash = genesisTransaction.getTransactionHash();
@@ -74,11 +77,16 @@ public class BitcoinTransactionTest {
         UInt32 seqNo = new UInt32(4294967295L);
         UIntVar outCounter = new UIntVar(2);
         long value_1 = 1009051983L;
-        UIntVar txOutScriptLength_1 = new UIntVar(new byte[]{(byte) 0x17});
-        byte[] txOutScript_1 = new byte[]{(byte) 0xA9, (byte) 0x14, (byte) 0xF0, (byte) 0x50, (byte) 0xC5, (byte) 0x91, (byte) 0xEA, (byte) 0x98, (byte) 0x26, (byte) 0x73, (byte) 0xCC, (byte) 0xED, (byte) 0xF5, (byte) 0x21, (byte) 0x13, (byte) 0x65, (byte) 0x7B, (byte) 0x67, (byte) 0x83, (byte) 0x03, (byte) 0xE6, (byte) 0xA1, (byte) 0x87};
+
+        BitcoinScript txOutScript1 = new BitcoinScript();
+        txOutScript1.setLength(new UIntVar(new byte[]{(byte) 0x17}));
+        txOutScript1.setScript(new Bytes(new byte[]{(byte) 0xA9, (byte) 0x14, (byte) 0xF0, (byte) 0x50, (byte) 0xC5, (byte) 0x91, (byte) 0xEA, (byte) 0x98, (byte) 0x26, (byte) 0x73, (byte) 0xCC, (byte) 0xED, (byte) 0xF5, (byte) 0x21, (byte) 0x13, (byte) 0x65, (byte) 0x7B, (byte) 0x67, (byte) 0x83, (byte) 0x03, (byte) 0xE6, (byte) 0xA1, (byte) 0x87}));
+
         long value_2 = 59801109L;
-        UIntVar txOutScriptLength_2 = new UIntVar(new byte[]{(byte) 0x19});
-        byte[] txOutScript_2 = new byte[]{(byte) 0x76, (byte) 0xA9, (byte) 0x14, (byte) 0xFB, (byte) 0x2E, (byte) 0x13, (byte) 0x83, (byte) 0x5E, (byte) 0x39, (byte) 0x88, (byte) 0xC7, (byte) 0x8F, (byte) 0x76, (byte) 0x0D, (byte) 0x4A, (byte) 0xC8, (byte) 0x1E, (byte) 0x04, (byte) 0xEA, (byte) 0xF1, (byte) 0x94, (byte) 0xEA, (byte) 0x92, (byte) 0x88, (byte) 0xAC};
+
+        BitcoinScript txOutScript2 = new BitcoinScript();
+        txOutScript2.setLength(new UIntVar(new byte[]{(byte) 0x19}));
+        txOutScript2.setScript(new Bytes(new byte[]{(byte) 0x76, (byte) 0xA9, (byte) 0x14, (byte) 0xFB, (byte) 0x2E, (byte) 0x13, (byte) 0x83, (byte) 0x5E, (byte) 0x39, (byte) 0x88, (byte) 0xC7, (byte) 0x8F, (byte) 0x76, (byte) 0x0D, (byte) 0x4A, (byte) 0xC8, (byte) 0x1E, (byte) 0x04, (byte) 0xEA, (byte) 0xF1, (byte) 0x94, (byte) 0xEA, (byte) 0x92, (byte) 0x88, (byte) 0xAC}));
 
         // there is only one input so we have only one list of stack items containing 2 items in this case
         UIntVar noOfStackItems = new UIntVar(new byte[]{0x02});
@@ -91,8 +99,8 @@ public class BitcoinTransactionTest {
         randomScriptWitnessInput.add(new BitcoinTransactionInput(previousTransactionHash, previousTxOutIndex, txInScriptLength, txInScript, seqNo));
         List<BitcoinTransactionOutput> randomScriptWitnessOutput = new ArrayList<BitcoinTransactionOutput>(2);
 
-        randomScriptWitnessOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value_1), txOutScriptLength_1, txOutScript_1));
-        randomScriptWitnessOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value_2), txOutScriptLength_2, txOutScript_2));
+        randomScriptWitnessOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value_1), txOutScript1));
+        randomScriptWitnessOutput.add(new BitcoinTransactionOutput(BigInteger.valueOf(value_2), txOutScript2));
         List<BitcoinScriptWitnessItem> randomScriptWitnessSWI = new ArrayList<BitcoinScriptWitnessItem>(1);
         List<BitcoinScriptWitness> randomScriptWitnessSW = new ArrayList<BitcoinScriptWitness>(2);
         randomScriptWitnessSW.add(new BitcoinScriptWitness(segwitnessLength_1, segwitnessScript_1));
