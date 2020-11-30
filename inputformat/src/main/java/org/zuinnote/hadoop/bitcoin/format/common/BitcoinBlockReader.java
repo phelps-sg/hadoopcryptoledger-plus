@@ -506,16 +506,17 @@ public class BitcoinBlockReader {
      * @throws java.io.IOException in case of errors reading from InputStream
      */
     private Long skipBlocksNotInFilter() throws IOException {
-        this.bin.mark(8);
+        bin.mark(8);
         Magic magicNo = new Magic(bin);
         UInt32 blockSize = new UInt32(bin);
-        this.bin.reset();
+        bin.reset();
         if (filterSpecificMagic) {
             for (byte[] filter : specificMagicByteArray) {
                 if (new Magic(filter).equals(magicNo)) {
                     return blockSize.getValue();
                 }
             }
+            bin.skip(blockSize.getValue());
             return null;
         } else {
             return blockSize.getValue();
