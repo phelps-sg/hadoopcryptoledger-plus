@@ -67,6 +67,9 @@ public class BitcoinBlockRecordReader extends AbstractBitcoinRecordReader<BytesW
      */
     @Override
     public boolean nextKeyValue() throws IOException {
+        if (getFilePosition() > getEnd()) {
+            return false;
+        }
         BitcoinBlock block = getBbr().readBlock();
         if (block == null) {
             return false;

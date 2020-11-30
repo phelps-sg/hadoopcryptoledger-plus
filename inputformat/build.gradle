@@ -27,7 +27,7 @@ compileJava.options.encoding = 'UTF-8'
 
 group = "com.mesonomics"
 archivesBaseName = "hadoopcryptoledger-plus-fileformat"
-version = "0.5"
+version = "0.6-SNAPSHOT"
 
 jar {
     manifest {
