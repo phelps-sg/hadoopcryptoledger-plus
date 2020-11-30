@@ -516,7 +516,7 @@ public class BitcoinBlockReader {
                     return blockSize.getValue();
                 }
             }
-            bin.skip(blockSize.getValue());
+            bin.skip(blockSize.getValue() + 8);
             return null;
         } else {
             return blockSize.getValue();
