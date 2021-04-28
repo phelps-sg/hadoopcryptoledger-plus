@@ -178,5 +178,5 @@ dependencies {
    // test
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
 	testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
-    compile 'org.bitcoinj:bitcoinj-core:0.15.7'
+    compile 'org.bitcoinj:bitcoinj-core:0.15.9'
 }
