@@ -454,8 +454,7 @@ public class BitcoinBlockReader {
             // increase by one byte if magic not found yet
             this.bin.reset();
             if (this.bin.skip(1) != 1) {
-                //TODO: Exception?
-                LOG.error("Error cannot skip 1 byte in InputStream");
+                throw new BitcoinBlockReadException("Error cannot skip 1 byte in InputStream");
             }
             currentSeek++;
         }
@@ -516,7 +515,7 @@ public class BitcoinBlockReader {
                     return blockSize.getValue();
                 }
             }
-            bin.skip(blockSize.getValue());
+            bin.skip(blockSize.getValue() + 8);
             return null;
         } else {
             return blockSize.getValue();
